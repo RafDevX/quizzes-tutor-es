@@ -53,6 +53,10 @@ public class StudentStats implements DomainEntity {
         this.teacherDashboard.addStudentStats(this);
     }
 
+    public void update() {
+
+    }
+
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
