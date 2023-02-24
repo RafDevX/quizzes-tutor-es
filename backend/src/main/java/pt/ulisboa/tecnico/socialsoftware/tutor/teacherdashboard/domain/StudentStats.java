@@ -61,7 +61,11 @@ public class StudentStats implements DomainEntity {
     }
 
     public void update() {
+        this.updateNumStudents();
+    }
 
+    private void updateNumStudents() {
+        this.numStudents = this.courseExecution.getStudents().size();
     }
 
     public void accept(Visitor visitor) {
