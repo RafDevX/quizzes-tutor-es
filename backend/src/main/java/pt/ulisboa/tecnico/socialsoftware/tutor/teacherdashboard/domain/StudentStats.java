@@ -13,6 +13,9 @@ public class StudentStats implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "num_students")
+    private Integer numStudents;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -53,6 +56,10 @@ public class StudentStats implements DomainEntity {
         this.teacherDashboard.addStudentStats(this);
     }
 
+    public Integer getNumStudents() {
+        return numStudents;
+    }
+
     public void update() {
 
     }
@@ -67,6 +74,7 @@ public class StudentStats implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", teacherDashboard=" + teacherDashboard +
+                ", numStudents=" + numStudents +
                 '}';
     }
 }
