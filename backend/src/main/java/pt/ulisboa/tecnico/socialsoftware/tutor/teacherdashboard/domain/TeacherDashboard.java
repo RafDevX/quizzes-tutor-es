@@ -32,6 +32,9 @@ public class TeacherDashboard implements DomainEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
     private final List<QuizStats> quizStats = new ArrayList<>();
+        
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
+    private final List<QuestionStats> questionStats = new ArrayList<>();
 
     public TeacherDashboard() {
     }
@@ -120,6 +123,36 @@ public class TeacherDashboard implements DomainEntity {
         this.quizStats.remove(quizStats);
     }
 
+    public List<QuestionStats> getQuestionStats() {
+        return questionStats;
+    }
+
+    public void addQuestionStats(QuestionStats questionStats) {
+        if (this.questionStats.stream().anyMatch(questionStats1 ->
+                Objects.equals(questionStats1.getCourseExecution().getId(),
+                        questionStats.getCourseExecution().getId()))
+        ) {
+            throw new TutorException(ErrorMessage.QUESTION_STATS_ALREADY_EXISTS,
+                    questionStats.getCourseExecution().getCourse().getId());
+        }
+        if (!Objects.equals(questionStats.getCourseExecution().getCourse().getId(),
+                this.courseExecution.getCourse().getId())) {
+            throw new TutorException(ErrorMessage.QUESTION_STATS_INCORRECT_COURSE,
+                    questionStats.getCourseExecution().getCourse().getId(),
+                    this.courseExecution.getCourse().getId());
+        }
+
+        this.questionStats.add(questionStats);
+    }
+
+    public void removeQuestionStats(QuestionStats questionStats) {
+        if (!this.questionStats.contains(questionStats)) {
+            throw new TutorException(ErrorMessage.QUESTION_STATS_NOT_FOUND, questionStats.getCourseExecution().getId());
+        }
+
+        this.questionStats.remove(questionStats);
+    }
+
     public void update() {
         this.studentStats.forEach(StudentStats::update);
         this.quizStats.forEach(QuizStats::update);
@@ -137,6 +170,7 @@ public class TeacherDashboard implements DomainEntity {
                 ", teacher=" + teacher +
                 ", studentStats=" + studentStats +
                 ", quizStats=" + quizStats +
+                ", questionStats=" + questionStats +
                 '}';
     }
 
