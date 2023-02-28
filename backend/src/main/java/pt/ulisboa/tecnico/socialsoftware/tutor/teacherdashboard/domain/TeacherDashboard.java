@@ -30,6 +30,9 @@ public class TeacherDashboard implements DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
     private final List<StudentStats> studentStats = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
+    private final List<QuizStats> quizStats = new ArrayList<>();
+
     public TeacherDashboard() {
     }
 
@@ -90,7 +93,34 @@ public class TeacherDashboard implements DomainEntity {
         this.studentStats.remove(studentStats);
     }
 
+    public List<QuizStats> getQuizStats() {
+        return Collections.unmodifiableList(quizStats);
+    }
+
+    public void addQuizStats(QuizStats quizStats) {
+        if (this.quizStats.stream().anyMatch(quizStats1 -> Objects.equals(quizStats1.getCourseExecution().getId(), quizStats.getCourseExecution().getId()))) {
+            throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_EXISTS,
+                    quizStats.getId());
+        }
+        if(!Objects.equals(quizStats.getCourseExecution().getCourse().getId(), this.courseExecution.getCourse().getId())) {
+            throw new TutorException(ErrorMessage.QUIZ_STATS_INCORRECT_COURSE,
+                    quizStats.getCourseExecution().getCourse().getId(),
+                    this.courseExecution.getCourse().getId());
+        }
+
+        this.quizStats.add(quizStats);
+    }
+
+    public void removeQuizStats(QuizStats quizStats) {
+        if (!this.quizStats.contains(quizStats)) {
+            throw new TutorException(ErrorMessage.QUIZ_STATS_NOT_FOUND, quizStats.getId());
+        }
+
+        this.quizStats.remove(quizStats);
+    }
+
     public void update() {
+        this.quizStats.forEach(QuizStats::update);
         this.studentStats.forEach(StudentStats::update);
     }
 
@@ -104,6 +134,7 @@ public class TeacherDashboard implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", teacher=" + teacher +
+                ", quizStats=" + quizStats +
                 ", studentStats=" + studentStats +
                 '}';
     }

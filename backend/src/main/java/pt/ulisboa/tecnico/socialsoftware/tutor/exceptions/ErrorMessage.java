@@ -157,6 +157,10 @@ public enum ErrorMessage {
     STUDENT_STATS_ALREADY_EXISTS("Student stats for this course execution (%d) already exists in this teacher dashboard"),
     STUDENT_STATS_INCORRECT_COURSE("Student stats course (%d) does not match teacher dashboard's course (%d)"),
     STUDENT_STATS_NOT_FOUND("Student stats does not belong to teacher dashboard"),
+    
+    QUIZ_STATS_ALREADY_EXISTS("Quiz stats already exists: %d"),
+    QUIZ_STATS_INCORRECT_COURSE("Quiz stats course %d does not match quiz course %d"),
+    QUIZ_STATS_NOT_FOUND("Quiz stats not found: %d"),
 
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
