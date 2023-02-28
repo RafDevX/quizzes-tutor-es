@@ -29,7 +29,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         given:
         def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
 
-        and: "additional course exectuion"
+        and: "additional course execution"
         def externalCourseExecution2 = new CourseExecution(externalCourse, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(externalCourseExecution2)
 
@@ -63,7 +63,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         given:
         def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
 
-        and: "additional course exectuion"
+        and: "additional course execution"
         def externalCourse2 = new Course(COURSE_1_NAME, Course.Type.TECNICO)
         courseRepository.save(externalCourse2)
         def externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
