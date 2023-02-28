@@ -102,7 +102,7 @@ public class TeacherDashboard implements DomainEntity {
             throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_EXISTS,
                     quizStats.getId());
         }
-        if(!Objects.equals(quizStats.getCourseExecution().getCourse().getId(), this.courseExecution.getCourse().getId())) {
+        if (!Objects.equals(quizStats.getCourseExecution().getCourse().getId(), this.courseExecution.getCourse().getId())) {
             throw new TutorException(ErrorMessage.QUIZ_STATS_INCORRECT_COURSE,
                     quizStats.getCourseExecution().getCourse().getId(),
                     this.courseExecution.getCourse().getId());

@@ -5,6 +5,8 @@ import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 
@@ -36,6 +38,26 @@ class AddQuizStatsTest extends SpockTest {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.errorMessage == ErrorMessage.QUIZ_STATS_ALREADY_EXISTS
+    }
+
+    def "add QuizStats with different course to dashboard"() {
+        given: "a new Course is created"
+        def externalCourse2 = new Course(COURSE_1_NAME, Course.Type.TECNICO)
+        courseRepository.save(externalCourse2)
+
+        and: "a new CourseExecution is created"
+        def externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple QuizStats are added to the dashboard"
+        def quizStats1 = new QuizStats(externalCourseExecution, teacherDashboard)
+        quizStatsRepository.save(quizStats1)
+        def quizStats2 = new QuizStats(externalCourseExecution2, teacherDashboard)
+        quizStatsRepository.save(quizStats2)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.errorMessage == ErrorMessage.QUIZ_STATS_INCORRECT_COURSE
     }
 
 
