@@ -154,6 +154,10 @@ public enum ErrorMessage {
 
     TEACHER_ALREADY_HAS_DASHBOARD("The teacher already has a dashboard for this course execution"),
 
+    STUDENT_STATS_ALREADY_EXISTS("Student stats for this course execution (%d) already exists in this teacher dashboard"),
+    STUDENT_STATS_INCORRECT_COURSE("Student stats course (%d) does not match teacher dashboard's course (%d)"),
+    STUDENT_STATS_NOT_FOUND("Student stats does not belong to teacher dashboard"),
+
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
 
