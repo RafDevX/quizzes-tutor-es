@@ -156,6 +156,7 @@ public class TeacherDashboard implements DomainEntity {
     public void update() {
         this.studentStats.forEach(StudentStats::update);
         this.quizStats.forEach(QuizStats::update);
+        this.questionStats.forEach(QuestionStats::update);
     }
 
     public void accept(Visitor visitor) {

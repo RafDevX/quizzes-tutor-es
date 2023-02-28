@@ -27,6 +27,7 @@ public class QuestionStats implements DomainEntity {
     public QuestionStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
         setCourseExecution(courseExecution);
         setTeacherDashboard(teacherDashboard);
+        update();
     }
 
     public void remove() {
@@ -53,6 +54,9 @@ public class QuestionStats implements DomainEntity {
     public void setTeacherDashboard(TeacherDashboard teacherDashboard) {
         this.teacherDashboard = teacherDashboard;
         this.teacherDashboard.addQuestionStats(this);
+    }
+
+    public void update() {
     }
 
     public void accept(Visitor visitor) {
