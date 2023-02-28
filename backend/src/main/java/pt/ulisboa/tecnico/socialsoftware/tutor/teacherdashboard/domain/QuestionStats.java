@@ -14,6 +14,9 @@ public class QuestionStats implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "num_available")
+    int numAvailable;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -37,6 +40,10 @@ public class QuestionStats implements DomainEntity {
 
     public Integer getId() {
         return id;
+    }
+
+    public int getNumAvailable() {
+        return numAvailable;
     }
 
     public CourseExecution getCourseExecution() {
@@ -67,6 +74,7 @@ public class QuestionStats implements DomainEntity {
     public String toString() {
         return "QuestionStats{" +
                 "id=" + id +
+                ", numAvailable=" + numAvailable +
                 ", courseExecution=" + courseExecution +
                 ", teacherDashboard=" + teacherDashboard +
                 '}';
