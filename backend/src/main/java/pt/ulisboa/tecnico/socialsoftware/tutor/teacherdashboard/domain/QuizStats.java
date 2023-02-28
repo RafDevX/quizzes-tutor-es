@@ -62,7 +62,11 @@ public class QuizStats implements DomainEntity {
     }
 
     public void update() {
+        this.updateNumQuizzes();
+    }
 
+    private void updateNumQuizzes() {
+        this.numQuizzes = courseExecution.getNumberOfQuizzes();
     }
 
     public void accept(Visitor visitor) {
