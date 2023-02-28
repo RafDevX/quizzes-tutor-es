@@ -4,6 +4,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 
 @DataJpaTest
@@ -21,22 +25,59 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         teacherDashboardRepository.save(teacherDashboard)
     }
 
-    def "add StudentStats to TeacherDashboard"() {
+    def "add student stats to teacher dashboard"() {
         given:
         def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
-        def studentStats = new StudentStats()
-        studentStatsRepository.save(studentStats)
-        studentStats.setCourseExecution(externalCourseExecution)
 
-        when:
-        studentStats.setTeacherDashboard(teacherDashboard)
+        and: "additional course exectuion"
+        def externalCourseExecution2 = new CourseExecution(externalCourse, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple student stats are added to teacher dashboard"
+        def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats)
+        def studentStats2 = new StudentStats(externalCourseExecution2, teacherDashboard)
+        studentStatsRepository.save(studentStats2)
+
+        then: "it gets added successfully"
+        teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 2
+        teacherDashboard.getStudentStats().contains(studentStats)
+    }
+
+    def "add duplicate student stats to teacher dashboard"() {
+        given: "teacher dashboard with one student stats"
+        def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
+        def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats)
+
+        when: "duplicate student stats is added to teacher dashboard"
         def studentStats2 = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats)
+
+        then:
+        def error = thrown(TutorException)
+        error.getErrorMessage() == ErrorMessage.STUDENT_STATS_ALREADY_EXISTS
+    }
+
+    def "add student stats with different course to teacher dashboard"() {
+        given:
+        def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
+
+        and: "additional course exectuion"
+        def externalCourse2 = new Course(COURSE_1_NAME, Course.Type.TECNICO)
+        courseRepository.save(externalCourse2)
+        def externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple student stats are added to teacher dashboard"
+        def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats)
+        def studentStats2 = new StudentStats(externalCourseExecution2, teacherDashboard)
         studentStatsRepository.save(studentStats2)
 
         then:
-        teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 2
-        teacherDashboard.getStudentStats().contains(studentStats)
-        teacherDashboard.getStudentStats().contains(studentStats2)
+        def error = thrown(TutorException)
+        error.getErrorMessage() == ErrorMessage.STUDENT_STATS_INCORRECT_COURSE
     }
 
     @TestConfiguration

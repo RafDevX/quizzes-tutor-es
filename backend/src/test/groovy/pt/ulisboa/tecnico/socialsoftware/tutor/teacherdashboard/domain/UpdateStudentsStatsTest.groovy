@@ -48,7 +48,7 @@ class UpdateStudentStatsTest extends SpockTest {
         externalCourseExecution2.addUser(student3)
     }
 
-    def "update students statistic" () {
+    def "update students statistic"() {
         given: "student stats of course"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
         studentStatsRepository.save(studentStats)
