@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 
 import javax.persistence.*;
 
@@ -64,6 +65,15 @@ public class QuestionStats implements DomainEntity {
     }
 
     public void update() {
+        this.updateNumAvailable();
+    }
+
+    public void updateNumAvailable() {
+        this.numAvailable = (int) this.courseExecution.getCourse()
+                .getQuestions()
+                .stream()
+                .filter(question -> question.getStatus() == Question.Status.AVAILABLE)
+                .count();
     }
 
     public void accept(Visitor visitor) {
