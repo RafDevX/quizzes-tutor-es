@@ -52,10 +52,11 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
 
         when: "duplicate student stats is added to teacher dashboard"
         def studentStats2 = new StudentStats(externalCourseExecution, teacherDashboard)
-        studentStatsRepository.save(studentStats)
+        studentStatsRepository.save(studentStats2)
 
         then:
         def error = thrown(TutorException)
+        teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 1
         error.getErrorMessage() == ErrorMessage.STUDENT_STATS_ALREADY_EXISTS
     }
 
@@ -76,6 +77,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         studentStatsRepository.save(studentStats2)
 
         then:
+        teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 1
         def error = thrown(TutorException)
         error.getErrorMessage() == ErrorMessage.STUDENT_STATS_INCORRECT_COURSE
     }
