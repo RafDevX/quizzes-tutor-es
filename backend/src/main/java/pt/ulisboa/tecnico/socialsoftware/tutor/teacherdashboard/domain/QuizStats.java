@@ -54,6 +54,10 @@ public class QuizStats implements DomainEntity {
         this.teacherDashboard.addQuizStats(this);
     }
 
+    public void update() {
+
+    }
+
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
