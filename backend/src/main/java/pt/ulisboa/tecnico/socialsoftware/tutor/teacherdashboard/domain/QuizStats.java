@@ -13,6 +13,9 @@ public class QuizStats implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "num_quizzes")
+    private Integer numQuizzes;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -54,11 +57,25 @@ public class QuizStats implements DomainEntity {
         this.teacherDashboard.addQuizStats(this);
     }
 
+    public Integer getNumQuizzes() {
+        return numQuizzes;
+    }
+
     public void update() {
 
     }
 
     public void accept(Visitor visitor) {
         // Only used for XML generation
+    }
+
+    @Override
+    public String toString() {
+        return "QuizStats{" +
+                "id=" + id +
+                ", courseExecution=" + courseExecution +
+                ", teacherDashboard=" + teacherDashboard +
+                ", numQuizzes=" + numQuizzes +
+                '}';
     }
 }
