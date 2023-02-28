@@ -32,7 +32,7 @@ public class QuizStats implements DomainEntity {
     }
 
     public void remove() {
-        teacherDashboard.getQuizStats().remove(this);
+        teacherDashboard.removeQuizStats(this);
         teacherDashboard = null;
     }
 
