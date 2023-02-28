@@ -104,6 +104,7 @@ public class TeacherDashboard implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", teacher=" + teacher +
+                ", studentStats=" + studentStats +
                 '}';
     }
 

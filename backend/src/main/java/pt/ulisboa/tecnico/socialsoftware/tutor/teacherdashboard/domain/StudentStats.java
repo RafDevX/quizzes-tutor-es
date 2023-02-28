@@ -77,7 +77,6 @@ public class StudentStats implements DomainEntity {
         return "StudentStats{" +
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
-                ", teacherDashboard=" + teacherDashboard +
                 ", numStudents=" + numStudents +
                 '}';
     }
