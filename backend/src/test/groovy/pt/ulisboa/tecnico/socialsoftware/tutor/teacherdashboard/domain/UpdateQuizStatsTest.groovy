@@ -21,10 +21,12 @@ class UpdateQuizStatsTest extends SpockTest {
     def setup() {
         createExternalCourseAndExecution()
 
-        // Thoroughly testing the dashboard update
         User user = new Student(USER_1_NAME, false)
         user.addCourse(externalCourseExecution)
         userRepository.save(user)
+        User user2 = new Student(USER_2_NAME, false)
+        user2.addCourse(externalCourseExecution)
+        userRepository.save(user2)
 
         Quiz quiz = new Quiz()
         quiz.setKey(1)
@@ -64,13 +66,16 @@ class UpdateQuizStatsTest extends SpockTest {
 
         then: "the quiz stats has correct stats values"
         quizStats.getNumQuizzes() == 1
+        quizStats.getAverageQuizzesSolved() == 0.5
 
         and: "the string representation is correct"
         quizStats.toString() == "QuizStats{" +
                 "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
-                ", numQuizzes=1}"
+                ", numQuizzes=1" +
+                ", averageQuizzesSolved=0.5" +
+                "}"
     }
 
     @TestConfiguration
