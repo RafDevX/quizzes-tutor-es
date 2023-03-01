@@ -61,6 +61,7 @@ class UpdateQuizStatsTest extends SpockTest {
 
         then: "the quiz stats has correct stats values"
         quizStats.getNumQuizzes() == 1
+        quizStats.getUniqueQuizzesSolved() == 1
         quizStats.getAverageQuizzesSolved() == 0
 
         and: "the string representation is correct"
@@ -69,6 +70,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
                 ", numQuizzes=1" +
+                ", uniqueQuizzesSolved=0" +
                 ", averageQuizzesSolved=0.0" +
                 "}"
     }
@@ -102,6 +104,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
                 ", numQuizzes=1" +
+                ", uniqueQuizzesSolved=1" +
                 ", averageQuizzesSolved=0.5" +
                 "}"
     }
