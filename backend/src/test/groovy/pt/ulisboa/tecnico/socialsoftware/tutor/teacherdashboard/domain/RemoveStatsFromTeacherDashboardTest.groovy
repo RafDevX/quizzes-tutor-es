@@ -34,7 +34,7 @@ class RemoveStatsFromTeacherDashboardTest extends SpockTest {
         def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
 
         when: "removing student stats from dashboard"
-        teacherDashboard.removeStudentStats(studentStats)
+        studentStats.remove()
 
         then: "it gets removed from dashboard"
         teacherDashboard.getStudentStats().size() == previousNumberStudentStats - 1

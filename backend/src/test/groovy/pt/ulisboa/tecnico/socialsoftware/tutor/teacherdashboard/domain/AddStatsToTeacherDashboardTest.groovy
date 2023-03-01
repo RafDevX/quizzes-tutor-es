@@ -42,6 +42,10 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         then: "it gets added successfully"
         teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 2
         teacherDashboard.getStudentStats().contains(studentStats)
+
+        and: "student stats dashboard is correct"
+        studentStats.getTeacherDashboard() == teacherDashboard
+        studentStats2.getTeacherDashboard() == teacherDashboard
     }
 
     def "add duplicate student stats to teacher dashboard"() {
