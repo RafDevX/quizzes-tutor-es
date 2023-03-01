@@ -49,7 +49,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         studentStats2.getTeacherDashboard() == teacherDashboard
 
         and: "students stats' teacher dashboards string representation are correct"
-        teacherDashboard.toString() == "Dashboard{" +
+        teacherDashboard.toString() == "TeacherDashboard{" +
                 "id=" +
                 teacherDashboard.getId() +
                 ", courseExecution=" + externalCourseExecution +
