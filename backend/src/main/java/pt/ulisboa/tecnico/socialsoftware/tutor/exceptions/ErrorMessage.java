@@ -159,7 +159,7 @@ public enum ErrorMessage {
     STUDENT_STATS_NOT_FOUND("Student stats does not belong to teacher dashboard"),
     
     QUIZ_STATS_ALREADY_EXISTS("Quiz stats for this course execution (%d) already exists in this teacher dashboard"),
-    QUIZ_STATS_INCORRECT_COURSE("Quiz stats course (%d) does not match teacher dashboard's (%d)"),
+    QUIZ_STATS_INCORRECT_COURSE("Quiz stats course (%d) does not match teacher dashboard's course (%d)"),
     QUIZ_STATS_NOT_FOUND("Quiz stats does not belong to teacher dashboard"),
 
     QUESTION_STATS_ALREADY_EXISTS("Question stats for this course execution (%d) already exists in this teacher dashboard"),
