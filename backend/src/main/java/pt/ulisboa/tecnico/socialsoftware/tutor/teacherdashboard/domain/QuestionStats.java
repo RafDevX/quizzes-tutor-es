@@ -43,10 +43,6 @@ public class QuestionStats implements DomainEntity {
         return id;
     }
 
-    public Integer getNumAvailable() {
-        return numAvailable;
-    }
-
     public CourseExecution getCourseExecution() {
         return courseExecution;
     }
@@ -62,6 +58,10 @@ public class QuestionStats implements DomainEntity {
     public void setTeacherDashboard(TeacherDashboard teacherDashboard) {
         this.teacherDashboard = teacherDashboard;
         this.teacherDashboard.addQuestionStats(this);
+    }
+
+    public Integer getNumAvailable() {
+        return numAvailable;
     }
 
     public void update() {
