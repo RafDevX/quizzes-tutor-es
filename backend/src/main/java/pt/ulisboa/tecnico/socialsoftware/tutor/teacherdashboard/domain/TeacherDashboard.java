@@ -124,7 +124,7 @@ public class TeacherDashboard implements DomainEntity {
     }
 
     public List<QuestionStats> getQuestionStats() {
-        return questionStats;
+        return Collections.unmodifiableList(questionStats);
     }
 
     public void addQuestionStats(QuestionStats questionStats) {
