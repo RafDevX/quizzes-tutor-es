@@ -35,7 +35,7 @@ public class QuestionStats implements DomainEntity {
     }
 
     public void remove() {
-        this.teacherDashboard.getQuestionStats().remove(this);
+        this.teacherDashboard.removeQuestionStats(this);
         this.teacherDashboard = null;
     }
 
@@ -84,9 +84,8 @@ public class QuestionStats implements DomainEntity {
     public String toString() {
         return "QuestionStats{" +
                 "id=" + id +
-                ", numAvailable=" + numAvailable +
                 ", courseExecution=" + courseExecution +
-                ", teacherDashboard=" + teacherDashboard +
+                ", numAvailable=" + numAvailable +
                 '}';
     }
 }

@@ -156,6 +156,75 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         exception.errorMessage == ErrorMessage.QUIZ_STATS_INCORRECT_COURSE
     }
 
+    def "add question stats to teacher dashboard"() {
+        given:
+        def previousNumberQuestionStats = teacherDashboard.getQuestionStats().size()
+
+        and: "additional course execution"
+        def externalCourseExecution2 = new CourseExecution(externalCourse, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple question stats are added to teacher dashboard"
+        def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats)
+        def questionStats2 = new QuestionStats(externalCourseExecution2, teacherDashboard)
+        questionStatsRepository.save(questionStats2)
+
+        then: "it gets added successfully"
+        teacherDashboard.getQuestionStats().size() == previousNumberQuestionStats + 2
+        teacherDashboard.getQuestionStats().contains(questionStats)
+
+        and: "question stats' teacher dashboards are correct"
+        questionStats.getTeacherDashboard() == teacherDashboard
+        questionStats2.getTeacherDashboard() == teacherDashboard
+
+        and: "question stats' teacher dashboards string representations are correct"
+        teacherDashboard.toString() == "TeacherDashboard{" +
+            "id=" + teacherDashboard.getId() +
+            ", courseExecution=" + externalCourseExecution +
+            ", teacher=" + teacher +
+            ", questionStats=[" +
+            questionStats + ", " + questionStats2 +
+            "]}";
+    }
+
+    def "add duplicate question stats to teacher dashboard"() {
+        given: "teacher dashboard with one question stats"
+        def previousNumberQuestionStats = teacherDashboard.getQuestionStats().size()
+        def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats)
+
+        when: "duplicate question stats is added to teacher dashboard"
+        def questionStats2 = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats2)
+
+        then:
+        def error = thrown(TutorException)
+        teacherDashboard.getQuestionStats().size() == previousNumberQuestionStats + 1
+        error.getErrorMessage() == ErrorMessage.QUESTION_STATS_ALREADY_EXISTS
+    }
+
+    def "add question stats with different course to teacher dashboard"() {
+        given:
+        def previousNumberQuestionStats = teacherDashboard.getQuestionStats().size()
+
+        and: "additional course execution"
+        def externalCourse2 = new Course(COURSE_1_NAME, Course.Type.TECNICO)
+        courseRepository.save(externalCourse2)
+        def externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple question stats are added to teacher dashboard"
+        def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats)
+        def questionStats2 = new QuestionStats(externalCourseExecution2, teacherDashboard)
+        questionStatsRepository.save(questionStats2)
+
+        then:
+        teacherDashboard.getQuestionStats().size() == previousNumberQuestionStats + 1
+        def error = thrown(TutorException)
+        error.getErrorMessage() == ErrorMessage.QUESTION_STATS_INCORRECT_COURSE
+    }
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}

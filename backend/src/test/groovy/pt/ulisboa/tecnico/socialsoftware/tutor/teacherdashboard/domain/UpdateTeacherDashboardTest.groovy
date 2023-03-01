@@ -44,7 +44,6 @@ class UpdateTeacherDashboardTest extends SpockTest {
         quiz.setCourseExecution(externalCourseExecution)
         quiz.setAvailableDate(DateHandler.now())
         quizRepository.save(quiz)
-
     }
 
     def "update teacher dashboard stats"() {
@@ -64,6 +63,14 @@ class UpdateTeacherDashboardTest extends SpockTest {
         quizStats2.getCourseExecution() >> externalCourseExecution2
         teacherDashboard.addQuizStats(quizStats2)
 
+        and: "question statistics in the teacher dashboard"
+        def questionStats1 = Mock(QuestionStats)
+        questionStats1.getCourseExecution() >> externalCourseExecution
+        teacherDashboard.addQuestionStats(questionStats1)
+        def questionStats2 = Mock(QuestionStats)
+        questionStats2.getCourseExecution() >> externalCourseExecution2
+        teacherDashboard.addQuestionStats(questionStats2)
+
         when: "updating dashboard"
         teacherDashboard.update()
 
@@ -74,6 +81,10 @@ class UpdateTeacherDashboardTest extends SpockTest {
         and: "update method is called (once) for every quiz stat"
         1 * quizStats1.update()
         1 * quizStats2.update()
+
+        and: "update method is called (once) for every question stat"
+        1 * questionStats1.update()
+        1 * questionStats2.update()
     }
 
     @TestConfiguration

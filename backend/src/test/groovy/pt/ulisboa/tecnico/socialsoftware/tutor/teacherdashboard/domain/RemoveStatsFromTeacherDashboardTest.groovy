@@ -8,7 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 
-
 @DataJpaTest
 class RemoveStatsFromTeacherDashboardTest extends SpockTest {
     def teacher
@@ -86,6 +85,40 @@ class RemoveStatsFromTeacherDashboardTest extends SpockTest {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.QUIZ_STATS_NOT_FOUND
+    }
+
+    def "remove question stats from teacher dashboard"() {
+        given: "question stats in teacher dashboard"
+        def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats)
+
+        and:
+        def previousNumberQuestionStats = teacherDashboard.getQuestionStats().size()
+
+        when: "removing question stats from dashboard"
+        questionStats.remove()
+
+        then: "it gets removed from dashboard"
+        teacherDashboard.getQuestionStats().size() == previousNumberQuestionStats - 1
+        !teacherDashboard.getQuestionStats().contains(questionStats)
+    }
+
+    def "remove question stats from teacher dashboard it isn't part of"() {
+        given: "question stats in teacher dashboard"
+        def questionStats = new QuestionStats()
+        questionStats.setCourseExecution(externalCourseExecution)
+        questionStatsRepository.save(questionStats)
+
+        and:
+        def previousNumberQuestionStats = teacherDashboard.getQuestionStats().size()
+
+        when: "removing question stats from dashboard"
+        teacherDashboard.removeQuestionStats(questionStats)
+
+        then: "it gets removed from dashboard"
+        teacherDashboard.getQuestionStats().size() == previousNumberQuestionStats
+        def error = thrown(TutorException)
+        error.getErrorMessage() == ErrorMessage.QUESTION_STATS_NOT_FOUND
     }
 
     @TestConfiguration
