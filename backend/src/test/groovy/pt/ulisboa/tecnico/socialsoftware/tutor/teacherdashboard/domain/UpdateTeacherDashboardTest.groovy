@@ -65,38 +65,23 @@ class UpdateTeacherDashboardTest extends SpockTest {
         1 * studentStats2.update()
     }
 
-    def createTeacherDashboard() {
-        dashboard = new TeacherDashboard(externalCourseExecution, teacher)
-        teacherDashboardRepository.save(dashboard)
-    }
+    def "update teacher dashboard stats"() {
+        given: "quiz statistics in the teacher dashboard"
+        def quizStats1 = Mock(QuizStats)
+        quizStats1.getCourseExecution() >> externalCourseExecution
+        teacherDashboard.addQuizStats(quizStats1)
+        def quizStats2 = Mock(QuizStats)
+        quizStats2.getCourseExecution() >> externalCourseExecution2
+        teacherDashboard.addQuizStats(quizStats2)
 
-    def createQuizStats() {
-        quizStats = new QuizStats(externalCourseExecution, dashboard)
-        quizStatsRepository.save(quizStats)
-    }
+        when: "updating dashboard"
+        teacherDashboard.update()
 
-    def "update a dashboard"() {
-        given: "a dashboard, a user and a quiz"
-        createTeacherDashboard()
-        def userId = userRepository.findAll().get(0).getId()
-        def quizId = quizRepository.findAll().get(0).getId()
-
-        and: "add quiz stats to the dashboard"
-        createQuizStats()
-
-        and: "create a quiz answer"
-        answerService.createQuizAnswer(userId, quizId)
-
-        when: "cron job updates the dashboard"
-        dashboard.update()
-
-        then: "the dashboard is (properly) updated"
-        dashboard.getQuizStats().get(0).getNumQuizzes() == 1
-        // TODO: missing tests for the following (not currently implemented) fields
-        dashboard.toString() != null
-
+        then: "update method is called (once) for every quiz stats"
+        1 * quizStats1.update()
+        1 * quizStats2.update()
     }
 
     @TestConfiguration
-    static class LocalBeanConfiguration extends BeanConfiguration {}
+    static class LocalBeanConfiguration extends BeanConfiguration { }
 }

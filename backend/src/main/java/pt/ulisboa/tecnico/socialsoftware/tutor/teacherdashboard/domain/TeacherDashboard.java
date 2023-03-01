@@ -50,6 +50,10 @@ public class TeacherDashboard implements DomainEntity {
         return id;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public CourseExecution getCourseExecution() {
         return courseExecution;
     }
@@ -131,7 +135,7 @@ public class TeacherDashboard implements DomainEntity {
 
     @Override
     public String toString() {
-        return "Dashboard{" +
+        return "TeacherDashboard{" +
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", teacher=" + teacher +

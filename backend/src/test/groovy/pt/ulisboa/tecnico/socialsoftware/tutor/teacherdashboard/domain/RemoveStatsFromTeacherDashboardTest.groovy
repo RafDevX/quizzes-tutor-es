@@ -64,23 +64,23 @@ class RemoveStatsFromTeacherDashboardTest extends SpockTest {
         return quizStats
     }
 
-    def "remove a QuizStats"() {
-        given: "a QuizStats"
+    def "remove a quiz stats"() {
+        given: "a quiz stats"
         def quizStats = createQuizStats()
 
-        when: "a QuizStats is removed"
+        when: "a quiz stats is removed"
         quizStats.remove()
 
-        then: "the QuizStats is removed"
+        then: "the quiz stats is removed"
         teacherDashboard.getQuizStats().size() == 0
     }
 
-    def "cannot remove quizStats that does not belong to dashboard"() {
-        given: "Add a QuizStats and remove it from the dashboard"
+    def "cannot remove quiz stats that does not belong to dashboard"() {
+        given: "Add a quiz stats and remove it from the teacher dashboard"
         def quizStats = createQuizStats()
         teacherDashboard.removeQuizStats(quizStats)
 
-        when: "the QuizStats is removed for the second time"
+        when: "the quiz stats is removed for the second time"
         teacherDashboard.removeQuizStats(quizStats)
 
         then: "an exception is thrown"

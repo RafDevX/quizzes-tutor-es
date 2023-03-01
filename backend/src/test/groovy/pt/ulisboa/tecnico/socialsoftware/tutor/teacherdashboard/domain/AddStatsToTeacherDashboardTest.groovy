@@ -4,12 +4,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
-import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 
 @DataJpaTest
 class AddStatsToTeacherDashboardTest extends SpockTest {
@@ -54,6 +54,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
                 teacherDashboard.getId() +
                 ", courseExecution=" + externalCourseExecution +
                 ", teacher=" + teacher +
+                ", quizStats=[]" +
                 ", studentStats=[" +
                 studentStats + ", " + studentStats2 +
                 ']}';
@@ -98,6 +99,66 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         error.getErrorMessage() == ErrorMessage.STUDENT_STATS_INCORRECT_COURSE
     }
 
+    def "add quiz stats to teacher dashboard"() {
+        when: "quiz stats is created"
+        def quizStats = new QuizStats(externalCourseExecution, teacherDashboard)
+        quizStatsRepository.save(quizStats)
+
+        then: "an empty quiz stats is created"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        result.getId() != 0
+        result.getCourseExecution().getId() == externalCourseExecution.getId()
+        result.getTeacherDashboard().getId() == teacherDashboard.getId()
+        result.getTeacherDashboard().getTeacher().getId() == teacher.getId()
+        result.getCourseExecution().getCourse().getId() == externalCourseExecution.getCourse().getId()
+
+        and: "the string representation is correct"
+        teacherDashboard.setId(1)
+        teacherDashboard.toString() == "TeacherDashboard{" +
+                "id=1" +
+                ", courseExecution=" + externalCourseExecution +
+                ", teacher=" + teacher +
+                ", quizStats=[" + quizStats +
+                "]," + " studentStats=[]" +
+                '}'
+    }
+
+    def "add duplicate quiz stats to teacher dashboard"() {
+        given: "a quiz stats is created"
+        def quizStats = new QuizStats(externalCourseExecution, teacherDashboard)
+        quizStatsRepository.save(quizStats)
+
+        when: "try to add the same quiz stats to the dashboard"
+        teacherDashboard.addQuizStats(quizStats)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.errorMessage == ErrorMessage.QUIZ_STATS_ALREADY_EXISTS
+    }
+
+    def "add quiz stats with different course to teacher dashboard"() {
+        given: "a new course is created"
+        def externalCourse2 = new Course(COURSE_1_NAME, Course.Type.TECNICO)
+        courseRepository.save(externalCourse2)
+
+        and: "a new course execution is created"
+        def externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        when: "multiple quiz stats are added to the teacher dashboard"
+        def quizStats1 = new QuizStats(externalCourseExecution, teacherDashboard)
+        quizStatsRepository.save(quizStats1)
+        def quizStats2 = new QuizStats(externalCourseExecution2, teacherDashboard)
+        quizStatsRepository.save(quizStats2)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.errorMessage == ErrorMessage.QUIZ_STATS_INCORRECT_COURSE
+    }
+
+
     @TestConfiguration
-    static class LocalBeanConfiguration extends BeanConfiguration { }
+    static class LocalBeanConfiguration extends BeanConfiguration {}
+
 }
