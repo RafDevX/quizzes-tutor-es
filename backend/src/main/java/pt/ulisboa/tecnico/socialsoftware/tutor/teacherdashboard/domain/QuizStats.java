@@ -17,6 +17,9 @@ public class QuizStats implements DomainEntity {
     @Column(name = "num_quizzes")
     private Integer numQuizzes;
 
+    @Column(name = "unique_quizzes_solved")
+    private Integer uniqueQuizzesSolved;
+
     @Column(name = "average_quizzes_solved")
     private Float averageQuizzesSolved;
 
