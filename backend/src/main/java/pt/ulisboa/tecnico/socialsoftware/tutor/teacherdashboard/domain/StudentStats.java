@@ -16,6 +16,9 @@ public class StudentStats implements DomainEntity {
     @Column(name = "num_students")
     private Integer numStudents;
 
+    @Column(name = "num_more_75_correct_questions")
+    private Integer numMore75CorrectQuestions;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -60,6 +63,10 @@ public class StudentStats implements DomainEntity {
         return numStudents;
     }
 
+    public Integer getNumMore75CorrectQuestions() {
+        return numMore75CorrectQuestions;
+    }
+
     public void update() {
         this.updateNumStudents();
     }
@@ -78,6 +85,7 @@ public class StudentStats implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", numStudents=" + numStudents +
+                ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
                 '}';
     }
 }
