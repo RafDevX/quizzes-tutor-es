@@ -27,7 +27,7 @@ class RemoveStatsFromTeacherDashboardTest extends SpockTest {
     def "remove student stats from teacher dashboard"() {
         given: "student stats in teacher dashboard"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        studentStatsRepository.save(studentStats)>
+        studentStatsRepository.save(studentStats)
 
         and:
         def previousNumberStudentStats = teacherDashboard.getStudentStats().size()
