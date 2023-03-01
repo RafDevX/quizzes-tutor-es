@@ -48,13 +48,15 @@ class UpdateTeacherDashboardTest extends SpockTest {
     }
 
     def "update teacher dashboard stats"() {
-        given: "statistics in the teacher dashboard"
+        given: "student statistics in the teacher dashboard"
         def studentStats1 = Mock(StudentStats)
         studentStats1.getCourseExecution() >> externalCourseExecution
         teacherDashboard.addStudentStats(studentStats1)
         def studentStats2 = Mock(StudentStats)
         studentStats2.getCourseExecution() >> externalCourseExecution2
         teacherDashboard.addStudentStats(studentStats2)
+
+        and: "quiz statistics in the teacher dashboard"
         def quizStats1 = Mock(QuizStats)
         quizStats1.getCourseExecution() >> externalCourseExecution
         teacherDashboard.addQuizStats(quizStats1)
@@ -65,9 +67,11 @@ class UpdateTeacherDashboardTest extends SpockTest {
         when: "updating dashboard"
         teacherDashboard.update()
 
-        then: "update method is called (once) for every stat"
+        then: "update method is called (once) for every student stat"
         1 * studentStats1.update()
         1 * studentStats2.update()
+
+        and: "update method is called (once) for every quiz stat"
         1 * quizStats1.update()
         1 * quizStats2.update()
     }
