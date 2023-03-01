@@ -4,6 +4,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 
 import javax.persistence.*;
 
@@ -68,17 +69,29 @@ public class QuizStats implements DomainEntity {
         return numQuizzes;
     }
 
+    public Integer getUniqueQuizzesSolved() {
+        return uniqueQuizzesSolved;
+    }
+
     public Float getAverageQuizzesSolved() {
         return averageQuizzesSolved;
-    }
 
     public void update() {
         this.updateNumQuizzes();
+        this.updateUniqueQuizzesSolved();
         this.updateAverageQuizzesSolved();
     }
 
     private void updateNumQuizzes() {
         this.numQuizzes = courseExecution.getNumberOfQuizzes();
+    }
+
+    private void updateUniqueQuizzesSolved() {
+        this.uniqueQuizzesSolved = (int) this.courseExecution.getStudents()
+            .stream()
+            .map(Student::getQuizAnswers)
+            .distinct()
+            .count();
     }
 
     private void updateAverageQuizzesSolved() {
@@ -102,6 +115,7 @@ public class QuizStats implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", numQuizzes=" + numQuizzes +
+                ", uniqueQuizzesSolved=" + uniqueQuizzesSolved +
                 ", averageQuizzesSolved=" + averageQuizzesSolved +
                 '}';
     }
