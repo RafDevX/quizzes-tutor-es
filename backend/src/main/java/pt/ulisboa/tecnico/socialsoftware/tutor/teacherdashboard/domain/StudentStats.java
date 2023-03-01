@@ -21,6 +21,9 @@ public class StudentStats implements DomainEntity {
     @Column(name = "num_more_75_correct_questions")
     private Integer numMore75CorrectQuestions;
 
+    @Column(name = "num_at_least_3_quizzes")
+    private Integer numAtLeast3Quizzes;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -69,6 +72,10 @@ public class StudentStats implements DomainEntity {
         return numMore75CorrectQuestions;
     }
 
+    public Integer getNumAtLeast3Quizzes() {
+        return numAtLeast3Quizzes;
+    }
+
     public void update() {
         this.updateNumStudents();
         this.updateNumMore75CorrectQuestions();
@@ -111,6 +118,7 @@ public class StudentStats implements DomainEntity {
                 ", courseExecution=" + courseExecution +
                 ", numStudents=" + numStudents +
                 ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
+                ", numAtLeast3Quizzes=" + numAtLeast3Quizzes +
                 '}';
     }
 }
