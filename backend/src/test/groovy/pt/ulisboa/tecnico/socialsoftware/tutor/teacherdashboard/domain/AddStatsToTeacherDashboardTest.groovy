@@ -56,7 +56,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
                 ", teacher=" + teacher +
                 ", studentStats=[" +
                 studentStats + ", " + studentStats2 +
-                "], quizStats=[]" +
+                "], quizStats=[], questionStats=[]" +
                 '}';
 
     }
@@ -120,7 +120,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
                 ", teacher=" + teacher +
                 ", studentStats=[]" +
                 ", quizStats=[" + quizStats +
-                ']}'
+                "], questionStats=[]}"
     }
 
     def "add duplicate quiz stats to teacher dashboard"() {
@@ -183,6 +183,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
             "id=" + teacherDashboard.getId() +
             ", courseExecution=" + externalCourseExecution +
             ", teacher=" + teacher +
+            ", studentStats=[], quizStats=[]" +
             ", questionStats=[" +
             questionStats + ", " + questionStats2 +
             "]}";
