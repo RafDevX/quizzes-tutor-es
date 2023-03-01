@@ -6,6 +6,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Entity
@@ -79,6 +80,7 @@ public class StudentStats implements DomainEntity {
     public void update() {
         this.updateNumStudents();
         this.updateNumMore75CorrectQuestions();
+        this.updateNumAtLeast3Quizzes();
     }
 
     private void updateNumStudents() {
@@ -104,6 +106,20 @@ public class StudentStats implements DomainEntity {
                     return totalQuestions == 0 ? 0 : correctQuestions * 100 / totalQuestions;
                 })
                 .filter(correctRate -> correctRate >= 75)
+                .count();
+    }
+
+    private void updateNumAtLeast3Quizzes() {
+        this.numAtLeast3Quizzes = (int) this.courseExecution.getQuizzes()
+                .stream()
+                .flatMap(quiz -> quiz.getQuizAnswers().stream())
+                .collect(Collectors.groupingBy(
+                        QuizAnswer::getStudent
+                ))
+                .values()
+                .stream()
+                .map(Collection::size)
+                .filter(size -> size >= 3)
                 .count();
     }
 
