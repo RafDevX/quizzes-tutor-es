@@ -18,6 +18,9 @@ public class QuestionStats implements DomainEntity {
     @Column(name = "num_available")
     private Integer numAvailable;
 
+    @Column(name = "answered_questions_unique")
+    private Integer answeredQuestionsUnique;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -64,6 +67,10 @@ public class QuestionStats implements DomainEntity {
         return numAvailable;
     }
 
+    public Integer getAnsweredQuestionsUnique() {
+        return answeredQuestionsUnique;
+    }
+
     public void update() {
         this.updateNumAvailable();
     }
@@ -86,6 +93,7 @@ public class QuestionStats implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", numAvailable=" + numAvailable +
+                ", answeredQuestionsUnique=" + answeredQuestionsUnique +
                 '}';
     }
 }
