@@ -98,7 +98,8 @@ public class TeacherDashboard implements DomainEntity {
     }
 
     public void addQuizStats(QuizStats quizStats) {
-        if (this.quizStats.stream().anyMatch(quizStats1 -> Objects.equals(quizStats1.getCourseExecution().getId(), quizStats.getCourseExecution().getId()))) {
+        if (this.quizStats.stream().anyMatch(quizStats1 -> Objects.equals(quizStats1.getCourseExecution().getId(),
+            quizStats.getCourseExecution().getId()))) {
             throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_EXISTS,
                     quizStats.getId());
         }
