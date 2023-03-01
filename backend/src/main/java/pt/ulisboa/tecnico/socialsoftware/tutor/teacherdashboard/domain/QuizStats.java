@@ -64,12 +64,25 @@ public class QuizStats implements DomainEntity {
         return numQuizzes;
     }
 
+    public float getAverageQuizzesSolved() {
+        return averageQuizzesSolved;
+    }
+
     public void update() {
         this.updateNumQuizzes();
+        this.updateAverageQuizzesSolved();
     }
 
     private void updateNumQuizzes() {
         this.numQuizzes = courseExecution.getNumberOfQuizzes();
+    }
+
+    private void updateAverageQuizzesSolved() {
+        this.averageQuizzesSolved = (float) this.courseExecution.getStudents()
+            .stream()
+            .mapToInt(student -> student.getQuizAnswers().size())
+            .average()
+            .orElse(0.0f);
     }
 
     public void accept(Visitor visitor) {
@@ -82,6 +95,7 @@ public class QuizStats implements DomainEntity {
                 "id=" + id +
                 ", courseExecution=" + courseExecution +
                 ", numQuizzes=" + numQuizzes +
+                ", averageQuizzesSolved=" + averageQuizzesSolved +
                 '}';
     }
 }
