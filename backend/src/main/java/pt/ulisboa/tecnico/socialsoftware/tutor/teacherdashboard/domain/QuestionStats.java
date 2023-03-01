@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
@@ -73,6 +75,7 @@ public class QuestionStats implements DomainEntity {
 
     public void update() {
         this.updateNumAvailable();
+        this.updateAnsweredQuestionsUnique();
     }
 
     public void updateNumAvailable() {
@@ -80,6 +83,17 @@ public class QuestionStats implements DomainEntity {
                 .getQuestions()
                 .stream()
                 .filter(question -> question.getStatus() == Question.Status.AVAILABLE)
+                .count();
+    }
+
+    public void updateAnsweredQuestionsUnique() {
+        this.answeredQuestionsUnique = (int) this.courseExecution.getQuizzes()
+                .stream()
+                .flatMap(quiz -> quiz.getQuizAnswers().stream())
+                .filter(QuizAnswer::isCompleted)
+                .flatMap(quizAnswer -> quizAnswer.getQuestionAnswers().stream())
+                .map(QuestionAnswer::getQuestion)
+                .distinct()
                 .count();
     }
 
