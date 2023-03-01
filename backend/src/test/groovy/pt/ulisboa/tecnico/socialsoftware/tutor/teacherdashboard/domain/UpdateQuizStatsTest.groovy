@@ -59,9 +59,6 @@ class UpdateQuizStatsTest extends SpockTest {
         and: "create a quiz answer"
         answerService.createQuizAnswer(userId, quizId)
 
-        and: "set id to the quiz stats"
-        quizStats.setId(1)
-
         when: "updating statistic"
         quizStats.update()
 
@@ -70,7 +67,7 @@ class UpdateQuizStatsTest extends SpockTest {
 
         and: "the string representation is correct"
         quizStats.toString() == "QuizStats{" +
-                "id=1" +
+                "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
                 ", numQuizzes=1}"

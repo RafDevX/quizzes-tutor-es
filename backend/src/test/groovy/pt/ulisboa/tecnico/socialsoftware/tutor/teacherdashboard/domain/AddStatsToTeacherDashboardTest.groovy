@@ -114,9 +114,8 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         result.getCourseExecution().getCourse().getId() == externalCourseExecution.getCourse().getId()
 
         and: "the string representation is correct"
-        teacherDashboard.setId(1)
         teacherDashboard.toString() == "TeacherDashboard{" +
-                "id=1" +
+                "id=" + teacherDashboard.getId() +
                 ", courseExecution=" + externalCourseExecution +
                 ", teacher=" + teacher +
                 ", quizStats=[" + quizStats +

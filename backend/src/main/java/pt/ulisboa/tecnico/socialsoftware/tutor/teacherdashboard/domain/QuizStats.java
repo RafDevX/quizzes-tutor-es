@@ -40,10 +40,6 @@ public class QuizStats implements DomainEntity {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public CourseExecution getCourseExecution() {
         return courseExecution;
     }
