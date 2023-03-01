@@ -58,6 +58,14 @@ class UpdateStudentStatsTest extends SpockTest {
 
         then: "it has correct stats values"
         studentStats.getNumStudents() == 2
+
+        and: "string representation is correct"
+        studentStats.toString() == "StudentStats{" +
+                "id=" +
+                studentStats.getId() +
+                ", courseExecution=" +
+                externalCourseExecution.toString() +
+                ", numStudents=2}"
     }
 
     @TestConfiguration

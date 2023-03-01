@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 
 @DataJpaTest
 class AddStatsToTeacherDashboardTest extends SpockTest {
@@ -18,7 +19,7 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
     def setup() {
         createExternalCourseAndExecution()
 
-        teacher = new Teacher(USER_1_NAME, false)
+        teacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         userRepository.save(teacher)
 
         teacherDashboard = new TeacherDashboard(externalCourseExecution, teacher)
@@ -43,9 +44,20 @@ class AddStatsToTeacherDashboardTest extends SpockTest {
         teacherDashboard.getStudentStats().size() == previousNumberStudentStats + 2
         teacherDashboard.getStudentStats().contains(studentStats)
 
-        and: "student stats dashboard is correct"
+        and: "student stats' teacher dashboards are correct"
         studentStats.getTeacherDashboard() == teacherDashboard
         studentStats2.getTeacherDashboard() == teacherDashboard
+
+        and: "students stats' teacher dashboards string representation are correct"
+        teacherDashboard.toString() == "Dashboard{" +
+                "id=" +
+                teacherDashboard.getId() +
+                ", courseExecution=" + externalCourseExecution +
+                ", teacher=" + teacher +
+                ", studentStats=[" +
+                studentStats + ", " + studentStats2 +
+                ']}';
+
     }
 
     def "add duplicate student stats to teacher dashboard"() {
