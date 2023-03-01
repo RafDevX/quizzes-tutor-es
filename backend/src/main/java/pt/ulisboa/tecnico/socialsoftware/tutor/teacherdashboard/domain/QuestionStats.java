@@ -16,7 +16,7 @@ public class QuestionStats implements DomainEntity {
     private Integer id;
 
     @Column(name = "num_available")
-    int numAvailable;
+    private Integer numAvailable;
 
     @OneToOne
     private CourseExecution courseExecution;
@@ -43,7 +43,7 @@ public class QuestionStats implements DomainEntity {
         return id;
     }
 
-    public int getNumAvailable() {
+    public Integer getNumAvailable() {
         return numAvailable;
     }
 
