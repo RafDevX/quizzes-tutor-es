@@ -83,5 +83,5 @@ class UpdateQuestionStatsTest extends SpockTest {
     }
 
     @TestConfiguration
-    static class LocalBeanConfiguration extends BeanConfiguration { }
+    static class LocalBeanConfiguration extends BeanConfiguration {}
 }
