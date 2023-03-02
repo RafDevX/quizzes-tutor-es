@@ -111,7 +111,9 @@ public class QuestionStats implements DomainEntity {
                 .stream()
                 .flatMap(quiz -> quiz.getQuizAnswers().stream())
                 .filter(QuizAnswer::isCompleted)
-                .collect(Collectors.groupingBy(QuizAnswer::getStudent))
+                .collect(Collectors.groupingBy(
+                        QuizAnswer::getStudent
+                ))
                 .values()
                 .stream()
                 .map(answers -> answers.stream()
