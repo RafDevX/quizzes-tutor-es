@@ -22,6 +22,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 class UpdateStudentStatsTest extends SpockTest {
     def teacher
     def teacherDashboard
+    def teacherDashboard2
     def externalCourse2
     def externalCourseExecution2
     def student1
@@ -42,6 +43,8 @@ class UpdateStudentStatsTest extends SpockTest {
     def quiz2Question2
     def quiz2Question2OptionOK
     def quiz2Question2OptionKO
+    def quiz3
+    def quiz3Question1
 
     def setup() {
         createExternalCourseAndExecution()
@@ -65,19 +68,22 @@ class UpdateStudentStatsTest extends SpockTest {
         externalCourseExecution2 = new CourseExecution(externalCourse2, COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(externalCourseExecution2)
 
+        teacherDashboard2 = new TeacherDashboard(externalCourseExecution2, teacher)
+        teacherDashboardRepository.save(teacherDashboard2)
+
         externalCourseExecution.addUser(student1)
         externalCourseExecution.addUser(student2)
         externalCourseExecution2.addUser(student2)
         externalCourseExecution2.addUser(student3)
 
-        quiz1 = createQuiz()
+        quiz1 = createQuiz(externalCourseExecution)
         quiz1Question1 = createQuestion(quiz1)
         quiz1Question1OptionOK = createOptions(quiz1Question1, true)
         quiz1Question1OptionKO = createOptions(quiz1Question1, false)
         quiz1Question2 = createQuestion(quiz1)
         quiz1Question2OptionOK = createOptions(quiz1Question2, true)
         quiz1Question2OptionKO = createOptions(quiz1Question2, false)
-        quiz2 = createQuiz()
+        quiz2 = createQuiz(externalCourseExecution)
         quiz2Question1 = createQuestion(quiz2)
         quiz2Question1OptionOK = createOptions(quiz2Question1, true)
         quiz2Question1OptionKO = createOptions(quiz2Question1, false)
@@ -88,7 +94,7 @@ class UpdateStudentStatsTest extends SpockTest {
     }
 
     def "update students statistic"() {
-        given: "student stats of course"
+        given: "student stats of courses"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
         studentStatsRepository.save(studentStats)
 
@@ -126,19 +132,36 @@ class UpdateStudentStatsTest extends SpockTest {
                 ", numMore75CorrectQuestions=1}"
     }
 
-    def createQuiz() {
+    def "update students statistics with no question answer"() {
+        def studentStats2 = new StudentStats(externalCourseExecution2, teacherDashboard2)
+        studentStatsRepository.save(studentStats2)
+
+        quiz3 = createQuiz(externalCourseExecution2)
+        quiz3Question1 = createQuestion(quiz3)
+
+        def quiz3AnswerStudent2 = createQuizAnswer(quiz3, student2)
+
+        when: "updating statistics"
+        studentStats2.update()
+
+        then: "it has correct stats values"
+        studentStats2.getNumStudents() == 2
+        studentStats2.getNumMore75CorrectQuestions() == 0
+    }
+
+    def createQuiz(CourseExecution courseExecution) {
         Quiz quiz = new Quiz()
         quiz.setType(Quiz.QuizType.PROPOSED.toString())
-        quiz.setCourseExecution(externalCourseExecution)
+        quiz.setCourseExecution(courseExecution)
         quizRepository.save(quiz)
 
         return quiz
     }
 
-    def createQuestion(quiz) {
+    def createQuestion(Quiz quiz) {
         def newQuestion = new Question()
         newQuestion.setTitle("Question Title")
-        newQuestion.setCourse(externalCourse)
+        newQuestion.setCourse(quiz.getCourseExecution().getCourse())
         def questionDetails = new MultipleChoiceQuestion()
         newQuestion.setQuestionDetails(questionDetails)
         questionRepository.save(newQuestion)
