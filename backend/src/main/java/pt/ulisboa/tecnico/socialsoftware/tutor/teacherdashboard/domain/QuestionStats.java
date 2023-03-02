@@ -23,6 +23,9 @@ public class QuestionStats implements DomainEntity {
     @Column(name = "answered_questions_unique")
     private Integer answeredQuestionsUnique;
 
+    @Column(name = "average_questions_answered")
+    private Float averageQuestionsAnswered;
+
     @OneToOne
     private CourseExecution courseExecution;
 
@@ -73,6 +76,10 @@ public class QuestionStats implements DomainEntity {
         return answeredQuestionsUnique;
     }
 
+    public Float getAverageQuestionsAnswered() {
+        return averageQuestionsAnswered;
+    }
+
     public void update() {
         this.updateNumAvailable();
         this.updateAnsweredQuestionsUnique();
@@ -108,6 +115,7 @@ public class QuestionStats implements DomainEntity {
                 ", courseExecution=" + courseExecution +
                 ", numAvailable=" + numAvailable +
                 ", answeredQuestionsUnique=" + answeredQuestionsUnique +
+                ", averageQuestionsAnswered=" + averageQuestionsAnswered +
                 '}';
     }
 }
