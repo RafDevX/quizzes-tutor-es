@@ -30,18 +30,24 @@ class UpdateQuizStatsTest extends SpockTest {
         student2 = new Student(USER_3_NAME, USER_3_USERNAME, USER_3_EMAIL, false, AuthUser.Type.EXTERNAL)
         userRepository.save(student2)
 
-        Quiz quiz = new Quiz()
-        quiz.setKey(1)
-        quiz.setType(Quiz.QuizType.GENERATED.toString())
-        quiz.setCourseExecution(externalCourseExecution)
-        quiz.setAvailableDate(DateHandler.now())
-        quizRepository.save(quiz)
+        createQuiz(1)
+        createQuiz(2)
+        createQuiz(3)
 
     }
 
     def createTeacherDashboard() {
         dashboard = new TeacherDashboard(externalCourseExecution, teacher)
         teacherDashboardRepository.save(dashboard)
+    }
+
+    def createQuiz(int key) {
+        Quiz quiz = new Quiz()
+        quiz.setKey(key)
+        quiz.setType(Quiz.QuizType.GENERATED.toString())
+        quiz.setCourseExecution(externalCourseExecution)
+        quiz.setAvailableDate(DateHandler.now())
+        quizRepository.save(quiz)
     }
 
     def createQuizStats() {
@@ -60,8 +66,8 @@ class UpdateQuizStatsTest extends SpockTest {
         quizStats.update()
 
         then: "the quiz stats has correct stats values"
-        quizStats.getNumQuizzes() == 1
-        quizStats.getUniqueQuizzesSolved() == 1
+        quizStats.getNumQuizzes() == 3
+        quizStats.getUniqueQuizzesSolved() == 0
         quizStats.getAverageQuizzesSolved() == 0
 
         and: "the string representation is correct"
@@ -69,7 +75,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
-                ", numQuizzes=1" +
+                ", numQuizzes=3" +
                 ", uniqueQuizzesSolved=0" +
                 ", averageQuizzesSolved=0.0" +
                 "}"
@@ -95,8 +101,9 @@ class UpdateQuizStatsTest extends SpockTest {
         quizStats.update()
 
         then: "the quiz stats has correct stats values"
-        quizStats.getNumQuizzes() == 1
-        quizStats.getAverageQuizzesSolved() == 0.5
+        quizStats.getNumQuizzes() == 3
+        quizStats.getUniqueQuizzesSolved() == 1
+        Float.compare(quizStats.getAverageQuizzesSolved(), 1/3) == 0
 
         and: "the string representation is correct"
         quizStats.toString() == "QuizStats{" +
@@ -105,7 +112,8 @@ class UpdateQuizStatsTest extends SpockTest {
                 quizStats.getCourseExecution() +
                 ", numQuizzes=1" +
                 ", uniqueQuizzesSolved=1" +
-                ", averageQuizzesSolved=0.5" +
+                ", averageQuizzesSolved=" +
+                quizStats.getAverageQuizzesSolved() +
                 "}"
     }
 
