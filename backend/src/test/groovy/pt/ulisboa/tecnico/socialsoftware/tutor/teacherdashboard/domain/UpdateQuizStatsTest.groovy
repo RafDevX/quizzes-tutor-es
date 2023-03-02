@@ -9,7 +9,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
-import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler
+
+import java.time.LocalDateTime
 
 @DataJpaTest
 class UpdateQuizStatsTest extends SpockTest {
@@ -23,17 +24,15 @@ class UpdateQuizStatsTest extends SpockTest {
     def setup() {
         createExternalCourseAndExecution()
 
+        createQuiz(1, LocalDateTime.now())
+        createQuiz(2, LocalDateTime.MAX)
+
         teacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.EXTERNAL)
         userRepository.save(teacher)
         student1 = new Student(USER_2_NAME, USER_2_USERNAME, USER_2_EMAIL, false, AuthUser.Type.EXTERNAL)
         userRepository.save(student1)
         student2 = new Student(USER_3_NAME, USER_3_USERNAME, USER_3_EMAIL, false, AuthUser.Type.EXTERNAL)
         userRepository.save(student2)
-
-        createQuiz(1)
-        createQuiz(2)
-        createQuiz(3)
-
     }
 
     def createTeacherDashboard() {
@@ -41,18 +40,18 @@ class UpdateQuizStatsTest extends SpockTest {
         teacherDashboardRepository.save(dashboard)
     }
 
-    def createQuiz(int key) {
+    def createQuizStats() {
+        quizStats = new QuizStats(externalCourseExecution, dashboard)
+        quizStatsRepository.save(quizStats)
+    }
+
+    def createQuiz(int key, LocalDateTime dateTime) {
         Quiz quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(Quiz.QuizType.GENERATED.toString())
         quiz.setCourseExecution(externalCourseExecution)
-        quiz.setAvailableDate(DateHandler.now())
+        quiz.setAvailableDate(dateTime)
         quizRepository.save(quiz)
-    }
-
-    def createQuizStats() {
-        quizStats = new QuizStats(externalCourseExecution, dashboard)
-        quizStatsRepository.save(quizStats)
     }
 
     def "update quiz stats with no students"() {
@@ -66,7 +65,7 @@ class UpdateQuizStatsTest extends SpockTest {
         quizStats.update()
 
         then: "the quiz stats has correct stats values"
-        quizStats.getNumQuizzes() == 3
+        quizStats.getNumQuizzes() == 1
         quizStats.getUniqueQuizzesSolved() == 0
         quizStats.getAverageQuizzesSolved() == 0
 
@@ -75,7 +74,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
-                ", numQuizzes=3" +
+                ", numQuizzes=1" +
                 ", uniqueQuizzesSolved=0" +
                 ", averageQuizzesSolved=0.0" +
                 "}"
@@ -101,7 +100,7 @@ class UpdateQuizStatsTest extends SpockTest {
         quizStats.update()
 
         then: "the quiz stats has correct stats values"
-        quizStats.getNumQuizzes() == 3
+        quizStats.getNumQuizzes() == 1
         quizStats.getUniqueQuizzesSolved() == 1
         quizStats.getAverageQuizzesSolved() == 0.5
 
@@ -110,7 +109,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
-                ", numQuizzes=3" +
+                ", numQuizzes=1" +
                 ", uniqueQuizzesSolved=1" +
                 ", averageQuizzesSolved=" +
                 quizStats.getAverageQuizzesSolved() +
