@@ -17,16 +17,18 @@ class UpdateQuizStatsTest extends SpockTest {
     def teacher
     def dashboard
     def quizStats
-    def User user
-    def User user2
+    def Student student1
+    def Student student2
 
     def setup() {
         createExternalCourseAndExecution()
 
-        user = new Student(USER_1_NAME, false)
-        userRepository.save(user)
-        user2 = new Student(USER_2_NAME, false)
-        userRepository.save(user2)
+        teacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.EXTERNAL)
+        userRepository.save(teacher)
+        student1 = new Student(USER_2_NAME, USER_2_USERNAME, USER_2_EMAIL, false, AuthUser.Type.EXTERNAL)
+        userRepository.save(student1)
+        student2 = new Student(USER_3_NAME, USER_3_USERNAME, USER_3_EMAIL, false, AuthUser.Type.EXTERNAL)
+        userRepository.save(student2)
 
         Quiz quiz = new Quiz()
         quiz.setKey(1)
@@ -35,8 +37,6 @@ class UpdateQuizStatsTest extends SpockTest {
         quiz.setAvailableDate(DateHandler.now())
         quizRepository.save(quiz)
 
-        teacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.EXTERNAL)
-        userRepository.save(teacher)
     }
 
     def createTeacherDashboard() {
@@ -75,19 +75,19 @@ class UpdateQuizStatsTest extends SpockTest {
 
     def "update quiz stats with students"() {
         given: "students being inserted in the course"
-        user.addCourse(externalCourseExecution)
-        user2.addCourse(externalCourseExecution)
+        student1.addCourse(externalCourseExecution)
+        student2.addCourse(externalCourseExecution)
 
         and: "a dashboard, a user and a quiz"
         createTeacherDashboard()
-        def userId = userRepository.findAll().get(0).getId()
+        def studentId = userRepository.findAll().get(1).getId() // student1 id
         def quizId = quizRepository.findAll().get(0).getId()
 
         and: "add quiz stats to the dashboard"
         createQuizStats()
 
         and: "create a quiz answer"
-        answerService.createQuizAnswer(userId, quizId)
+        answerService.createQuizAnswer(studentId, quizId)
 
         when: "updating statistic"
         quizStats.update()
