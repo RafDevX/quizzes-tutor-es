@@ -94,8 +94,7 @@ public class StudentStats implements DomainEntity {
                     final long correctQuestions = answers.stream()
                             .map(QuizAnswer::getNumberOfCorrectAnswers)
                             .reduce(0L, Long::sum);
-
-                    return correctQuestions * 100 / totalQuestions;
+                    return totalQuestions == 0 ? 0 : correctQuestions * 100 / totalQuestions;
                 })
                 .filter(correctRate -> correctRate >= 75)
                 .count();
