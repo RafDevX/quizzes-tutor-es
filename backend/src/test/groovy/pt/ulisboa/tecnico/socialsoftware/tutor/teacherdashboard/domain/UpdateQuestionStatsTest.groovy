@@ -4,7 +4,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
@@ -44,26 +43,23 @@ class UpdateQuestionStatsTest extends SpockTest {
 
         def quiz1 = createQuiz(1)
         def quiz2 = createQuiz(2)
+        def quiz3 = createQuiz(3)
+        def quiz4 = createQuiz(4)
+        def quiz5 = createQuiz(5)
 
-        def quizQuestion1 = createQuizQuestion(quiz1, question1, 1)
-        def quizQuestion2 = createQuizQuestion(quiz1, question2, 2)
-        def quizQuestion2Again = createQuizQuestion(quiz2, question2, 3)
-        def quizQuestion3 = createQuizQuestion(quiz2, question3, 4)
+        createQuizQuestion(quiz1, question1, 1)
+        createQuizQuestion(quiz1, question2, 2)
+        createQuizQuestion(quiz2, question1, 1)
+        createQuizQuestion(quiz3, question1, 1)
+        createQuizQuestion(quiz4, question2, 1)
+        createQuizQuestion(quiz5, question3, 1)
 
-        def quizAnswer1 = createQuizAnswer(student1, quiz1, true)
-        def quizAnswer2 = createQuizAnswer(student2, quiz1, true)
-        def quizAnswer3 = createQuizAnswer(student3, quiz1, true)
-        def quizAnswer4 = createQuizAnswer(student2, quiz2, false)
-        def quizAnswer5 = createQuizAnswer(student1, quiz2, false)
-
-        createQuestionAnswer(quizAnswer1, quizQuestion1, 1)
-        createQuestionAnswer(quizAnswer1, quizQuestion2, 2)
-        createQuestionAnswer(quizAnswer2, quizQuestion1, 1)
-        createQuestionAnswer(quizAnswer2, quizQuestion2, 2)
-        createQuestionAnswer(quizAnswer3, quizQuestion1, 1)
-        createQuestionAnswer(quizAnswer3, quizQuestion1, 2)
-        createQuestionAnswer(quizAnswer4, quizQuestion3, 1)
-        createQuestionAnswer(quizAnswer5, quizQuestion2Again, 1)
+        createQuizAnswer(student1, quiz1, true)
+        createQuizAnswer(student1, quiz4, false)
+        createQuizAnswer(student2, quiz1, true)
+        createQuizAnswer(student2, quiz5, false)
+        createQuizAnswer(student3, quiz2, true)
+        createQuizAnswer(student3, quiz3, true)
     }
 
     def "update question stats"() {
@@ -77,6 +73,7 @@ class UpdateQuestionStatsTest extends SpockTest {
         then: "it has correct stats values"
         questionStats.getNumAvailable() == 2
         questionStats.getAnsweredQuestionsUnique() == 2
+        Float.compare(questionStats.getAverageQuestionsAnswered(), 5/3) == 0
 
         and: "string representations is correct"
         questionStats.toString() == "QuestionStats{" +
@@ -84,6 +81,8 @@ class UpdateQuestionStatsTest extends SpockTest {
                 ", courseExecution=" + externalCourseExecution.toString() +
                 ", numAvailable=" + "2" +
                 ", answeredQuestionsUnique=" + "2" +
+                ", averageQuestionsAnswered=" + questionStats.getAverageQuestionsAnswered() +
+                // ^^ need to use getter instead of hardcoding as actual value isn't known (float approximations)
                 "}"
     }
 
@@ -127,12 +126,6 @@ class UpdateQuestionStatsTest extends SpockTest {
         quizAnswer.setCompleted(completed)
         quizAnswerRepository.save(quizAnswer)
         return quizAnswer
-    }
-
-    def createQuestionAnswer(QuizAnswer quizAnswer, QuizQuestion quizQuestion, int sequence) {
-        def questionAnswer = new QuestionAnswer(quizAnswer, quizQuestion, sequence)
-        questionAnswerRepository.save(questionAnswer)
-        return questionAnswer
     }
 
     @TestConfiguration
