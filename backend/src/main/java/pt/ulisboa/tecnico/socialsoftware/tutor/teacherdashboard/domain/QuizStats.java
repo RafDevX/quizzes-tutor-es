@@ -76,6 +76,7 @@ public class QuizStats implements DomainEntity {
 
     public Float getAverageQuizzesSolved() {
         return averageQuizzesSolved;
+    }
 
     public void update() {
         this.updateNumQuizzes();

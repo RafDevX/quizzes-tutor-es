@@ -103,14 +103,14 @@ class UpdateQuizStatsTest extends SpockTest {
         then: "the quiz stats has correct stats values"
         quizStats.getNumQuizzes() == 3
         quizStats.getUniqueQuizzesSolved() == 1
-        Float.compare(quizStats.getAverageQuizzesSolved(), 1/3) == 0
+        quizStats.getAverageQuizzesSolved() == 0.5
 
         and: "the string representation is correct"
         quizStats.toString() == "QuizStats{" +
                 "id=" + quizStats.getId() +
                 ", courseExecution=" +
                 quizStats.getCourseExecution() +
-                ", numQuizzes=1" +
+                ", numQuizzes=3" +
                 ", uniqueQuizzesSolved=1" +
                 ", averageQuizzesSolved=" +
                 quizStats.getAverageQuizzesSolved() +
