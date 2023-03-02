@@ -45,6 +45,11 @@ class UpdateStudentStatsTest extends SpockTest {
     def quiz2Question2OptionKO
     def quiz3
     def quiz3Question1
+    def quiz3Question1OptionOK
+    def quiz3Question1OptionKO
+    def quiz3Question2
+    def quiz3Question2OptionOK
+    def quiz3Question2OptionKO
 
     def setup() {
         createExternalCourseAndExecution()
@@ -90,7 +95,13 @@ class UpdateStudentStatsTest extends SpockTest {
         quiz2Question2 = createQuestion(quiz2)
         quiz2Question2OptionOK = createOptions(quiz2Question2, true)
         quiz2Question2OptionKO = createOptions(quiz2Question2, false)
-
+        quiz3 = createQuiz(externalCourseExecution)
+        quiz3Question1 = createQuestion(quiz3)
+        quiz3Question1OptionOK = createOptions(quiz3Question1, true)
+        quiz3Question1OptionKO = createOptions(quiz3Question1, false)
+        quiz3Question2 = createQuestion(quiz3)
+        quiz3Question2OptionOK = createOptions(quiz3Question2, true)
+        quiz3Question2OptionKO = createOptions(quiz3Question2, false)
     }
 
     def "update students statistic"() {
@@ -98,13 +109,16 @@ class UpdateStudentStatsTest extends SpockTest {
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
         studentStatsRepository.save(studentStats)
 
-        and: "student with 75% correct answers"
+        and: "student with >=75% correct answers and 3 solved quizzes"
         def quiz1AnswerStudent1 = createQuizAnswer(quiz1, student1)
         createQuestionAnswer(quiz1AnswerStudent1, quiz1Question1, quiz1Question1OptionOK)
         createQuestionAnswer(quiz1AnswerStudent1, quiz1Question2, quiz1Question2OptionOK)
         def quiz2AnswerStudent1 = createQuizAnswer(quiz2, student1)
-        createQuestionAnswer(quiz2AnswerStudent1, quiz1Question1, quiz1Question1OptionOK)
+        createQuestionAnswer(quiz2AnswerStudent1, quiz2Question1, quiz2Question1OptionOK)
         createQuestionAnswer(quiz2AnswerStudent1, quiz2Question2, quiz2Question2OptionKO)
+        def quiz3AnswerStudent1 = createQuizAnswer(quiz3, student1)
+        createQuestionAnswer(quiz3AnswerStudent1, quiz3Question1, quiz3Question1OptionOK)
+        createQuestionAnswer(quiz3AnswerStudent1, quiz3Question2, quiz3Question2OptionOK)
 
         and: "student with 50% correct answers"
         def quiz1AnswerStudent2 = createQuizAnswer(quiz1, student2)
@@ -120,7 +134,7 @@ class UpdateStudentStatsTest extends SpockTest {
         then: "it has correct stats values"
         studentStats.getNumStudents() == 2
         studentStats.getNumMore75CorrectQuestions() == 1
-
+        studentStats.getNumAtLeast3Quizzes() == 1
 
         and: "string representation is correct"
         studentStats.toString() == "StudentStats{" +
@@ -129,17 +143,18 @@ class UpdateStudentStatsTest extends SpockTest {
                 ", courseExecution=" +
                 externalCourseExecution.toString() +
                 ", numStudents=2" +
-                ", numMore75CorrectQuestions=1}"
+                ", numMore75CorrectQuestions=1" +
+                ", numAtLeast3Quizzes=1}"
     }
 
     def "update students statistics with no question answer"() {
         def studentStats2 = new StudentStats(externalCourseExecution2, teacherDashboard2)
         studentStatsRepository.save(studentStats2)
 
-        quiz3 = createQuiz(externalCourseExecution2)
-        quiz3Question1 = createQuestion(quiz3)
+        def quiz = createQuiz(externalCourseExecution2)
+        def quizQuestion = createQuestion(quiz)
 
-        def quiz3AnswerStudent2 = createQuizAnswer(quiz3, student2)
+        def quizAnswerStudent2 = createQuizAnswer(quiz, student2)
 
         when: "updating statistics"
         studentStats2.update()
