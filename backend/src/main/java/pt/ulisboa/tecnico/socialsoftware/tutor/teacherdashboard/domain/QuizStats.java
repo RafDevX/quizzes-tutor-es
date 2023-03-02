@@ -17,7 +17,7 @@ public class QuizStats implements DomainEntity {
     private Integer numQuizzes;
 
     @Column(name = "average_quizzes_solved")
-    private float averageQuizzesSolved;
+    private Float averageQuizzesSolved;
 
     @OneToOne
     private CourseExecution courseExecution;
@@ -64,7 +64,7 @@ public class QuizStats implements DomainEntity {
         return numQuizzes;
     }
 
-    public float getAverageQuizzesSolved() {
+    public Float getAverageQuizzesSolved() {
         return averageQuizzesSolved;
     }
 
