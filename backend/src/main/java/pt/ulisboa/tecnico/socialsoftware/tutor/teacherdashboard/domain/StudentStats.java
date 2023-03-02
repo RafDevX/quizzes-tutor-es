@@ -37,6 +37,7 @@ public class StudentStats implements DomainEntity {
     public StudentStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
         setCourseExecution(courseExecution);
         setTeacherDashboard(teacherDashboard);
+        update();
     }
 
     public void remove() {
