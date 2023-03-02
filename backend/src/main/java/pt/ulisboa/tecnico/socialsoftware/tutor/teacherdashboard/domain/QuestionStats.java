@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 
 import javax.persistence.*;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -83,6 +84,7 @@ public class QuestionStats implements DomainEntity {
     public void update() {
         this.updateNumAvailable();
         this.updateAnsweredQuestionsUnique();
+        this.updateAverageQuestionsAnswered();
     }
 
     public void updateNumAvailable() {
@@ -102,6 +104,25 @@ public class QuestionStats implements DomainEntity {
                 .map(QuestionAnswer::getQuestion)
                 .distinct()
                 .count();
+    }
+
+    public void updateAverageQuestionsAnswered() {
+        this.averageQuestionsAnswered = (float) this.courseExecution.getQuizzes()
+                .stream()
+                .flatMap(quiz -> quiz.getQuizAnswers().stream())
+                .filter(QuizAnswer::isCompleted)
+                .collect(Collectors.groupingBy(QuizAnswer::getStudent))
+                .values()
+                .stream()
+                .map(answers -> answers.stream()
+                        .flatMap(quizAnswer -> quizAnswer.getQuestionAnswers().stream())
+                        .map(QuestionAnswer::getQuestion)
+                        .distinct()
+                        .count()
+                )
+                .mapToDouble(Long::doubleValue)
+                .average()
+                .orElse(0D);
     }
 
     public void accept(Visitor visitor) {
