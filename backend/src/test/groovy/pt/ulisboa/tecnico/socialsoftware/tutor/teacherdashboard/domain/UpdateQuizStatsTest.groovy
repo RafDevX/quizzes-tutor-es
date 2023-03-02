@@ -17,15 +17,15 @@ class UpdateQuizStatsTest extends SpockTest {
     def teacher
     def dashboard
     def quizStats
+    def User user
+    def User user2
 
     def setup() {
         createExternalCourseAndExecution()
 
-        User user = new Student(USER_1_NAME, false)
-        user.addCourse(externalCourseExecution)
+        user = new Student(USER_1_NAME, false)
         userRepository.save(user)
-        User user2 = new Student(USER_2_NAME, false)
-        user2.addCourse(externalCourseExecution)
+        user2 = new Student(USER_2_NAME, false)
         userRepository.save(user2)
 
         Quiz quiz = new Quiz()
@@ -49,8 +49,36 @@ class UpdateQuizStatsTest extends SpockTest {
         quizStatsRepository.save(quizStats)
     }
 
-    def "update quiz stats"() {
+    def "update quiz stats with no students"() {
         given: "a dashboard, a user and a quiz"
+        createTeacherDashboard()
+
+        and: "add quiz stats to the dashboard"
+        createQuizStats()
+
+        when: "updating statistic"
+        quizStats.update()
+
+        then: "the quiz stats has correct stats values"
+        quizStats.getNumQuizzes() == 1
+        quizStats.getAverageQuizzesSolved() == 0
+
+        and: "the string representation is correct"
+        quizStats.toString() == "QuizStats{" +
+                "id=" + quizStats.getId() +
+                ", courseExecution=" +
+                quizStats.getCourseExecution() +
+                ", numQuizzes=1" +
+                ", averageQuizzesSolved=0.0" +
+                "}"
+    }
+
+    def "update quiz stats with students"() {
+        given: "students being inserted in the course"
+        user.addCourse(externalCourseExecution)
+        user2.addCourse(externalCourseExecution)
+
+        and: "a dashboard, a user and a quiz"
         createTeacherDashboard()
         def userId = userRepository.findAll().get(0).getId()
         def quizId = quizRepository.findAll().get(0).getId()
