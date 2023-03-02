@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class QuizStats implements DomainEntity {
@@ -85,7 +86,12 @@ public class QuizStats implements DomainEntity {
     }
 
     private void updateNumQuizzes() {
-        this.numQuizzes = courseExecution.getNumberOfQuizzes();
+        final LocalDateTime now = LocalDateTime.now();
+        this.numQuizzes = (int) courseExecution
+            .getQuizzes()
+            .stream()
+            .filter(quiz -> quiz.getAvailableDate().isBefore(now))
+            .count();
     }
 
     private void updateUniqueQuizzesSolved() {
