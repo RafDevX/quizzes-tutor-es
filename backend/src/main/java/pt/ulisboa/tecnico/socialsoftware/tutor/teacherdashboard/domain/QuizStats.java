@@ -86,7 +86,7 @@ public class QuizStats implements DomainEntity {
                 .flatMap(quizAnswers -> quizAnswers.stream())
                 .count();
 
-        this.averageQuizzesSolved = numStudents != 0 ? numQuizAnswers / numStudents : 0;
+        this.averageQuizzesSolved = numStudents == 0 ? 0 : numQuizAnswers / numStudents;
     }
 
     public void accept(Visitor visitor) {
