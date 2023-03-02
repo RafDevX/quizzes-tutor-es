@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
@@ -89,7 +90,8 @@ public class QuizStats implements DomainEntity {
     private void updateUniqueQuizzesSolved() {
         this.uniqueQuizzesSolved = (int) this.courseExecution.getStudents()
             .stream()
-            .map(Student::getQuizAnswers)
+            .flatMap(student -> student.getQuizAnswers().stream())
+            .map(QuizAnswer::getQuiz)
             .distinct()
             .count();
     }
