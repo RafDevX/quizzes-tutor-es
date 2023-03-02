@@ -80,7 +80,7 @@ class UpdateQuizStatsTest extends SpockTest {
 
         and: "a dashboard, a user and a quiz"
         createTeacherDashboard()
-        def studentId = userRepository.findAll().get(1).getId() // student1 id
+        def studentId = student1.getId()
         def quizId = quizRepository.findAll().get(0).getId()
 
         and: "add quiz stats to the dashboard"
