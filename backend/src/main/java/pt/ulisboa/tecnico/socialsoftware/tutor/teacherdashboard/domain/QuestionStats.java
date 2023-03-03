@@ -107,7 +107,8 @@ public class QuestionStats implements DomainEntity {
     }
 
     public void updateAverageQuestionsAnswered() {
-        this.averageQuestionsAnswered = (float) this.courseExecution.getQuizzes()
+        final int totalStudents = this.courseExecution.getStudents().size();
+        final long totalAnsweredQuestions = this.courseExecution.getQuizzes()
                 .stream()
                 .flatMap(quiz -> quiz.getQuizAnswers().stream())
                 .filter(QuizAnswer::isCompleted)
@@ -122,9 +123,9 @@ public class QuestionStats implements DomainEntity {
                         .distinct()
                         .count()
                 )
-                .mapToDouble(Long::doubleValue)
-                .average()
-                .orElse(0D);
+                .reduce(0L, Long::sum);
+
+        this.averageQuestionsAnswered = totalStudents == 0 ? 0.0f : (float) totalAnsweredQuestions / totalStudents;
     }
 
     public void accept(Visitor visitor) {
