@@ -18,6 +18,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler
 class UpdateQuestionStatsTest extends SpockTest {
     def teacher
     def teacherDashboard
+    def quiz1
+    def quiz2
+    def quiz3
+    def quiz4
+    def quiz5
 
     def setup() {
         createExternalCourseAndExecution()
@@ -37,15 +42,11 @@ class UpdateQuestionStatsTest extends SpockTest {
         def question2 = createQuestion(2, topic, Question.Status.REMOVED)
         def question3 = createQuestion(3, topic, Question.Status.AVAILABLE)
 
-        def student1 = createStudent(USER_2_NAME, USER_2_USERNAME, USER_2_EMAIL)
-        def student2 = createStudent(USER_3_NAME, USER_3_USERNAME, USER_3_EMAIL)
-        def student3 = createStudent(USER_4_NAME, USER_4_USERNAME, USER_4_EMAIL)
-
-        def quiz1 = createQuiz(1)
-        def quiz2 = createQuiz(2)
-        def quiz3 = createQuiz(3)
-        def quiz4 = createQuiz(4)
-        def quiz5 = createQuiz(5)
+        quiz1 = createQuiz(1)
+        quiz2 = createQuiz(2)
+        quiz3 = createQuiz(3)
+        quiz4 = createQuiz(4)
+        quiz5 = createQuiz(5)
 
         createQuizQuestion(quiz1, question1, 1)
         createQuizQuestion(quiz1, question2, 2)
@@ -53,16 +54,9 @@ class UpdateQuestionStatsTest extends SpockTest {
         createQuizQuestion(quiz3, question1, 1)
         createQuizQuestion(quiz4, question2, 1)
         createQuizQuestion(quiz5, question3, 1)
-
-        createQuizAnswer(student1, quiz1, true)
-        createQuizAnswer(student1, quiz4, false)
-        createQuizAnswer(student2, quiz1, true)
-        createQuizAnswer(student2, quiz5, false)
-        createQuizAnswer(student3, quiz2, true)
-        createQuizAnswer(student3, quiz3, true)
     }
 
-    def "update question stats"() {
+    def "update question stats with no students"() {
         given: "question stats of execution course"
         def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
         questionStatsRepository.save(questionStats)
@@ -72,10 +66,47 @@ class UpdateQuestionStatsTest extends SpockTest {
 
         then: "it has correct stats values"
         questionStats.getNumAvailable() == 2
-        questionStats.getAnsweredQuestionsUnique() == 2
-        Float.compare(questionStats.getAverageQuestionsAnswered(), 5/3) == 0
+        questionStats.getAnsweredQuestionsUnique() == 0
+        Float.compare(questionStats.getAverageQuestionsAnswered(), 0.0f) == 0
 
-        and: "string representations is correct"
+        and: "string representation is correct"
+        questionStats.toString() == "QuestionStats{" +
+                "id=" + questionStats.getId() +
+                ", courseExecution=" + externalCourseExecution.toString() +
+                ", numAvailable=" + "2" +
+                ", answeredQuestionsUnique=" + "0" +
+                ", averageQuestionsAnswered=" + questionStats.getAverageQuestionsAnswered() +
+                // ^^ need to use getter instead of hardcoding as actual value isn't known (float approximations)
+                "}"
+    }
+
+    def "update question stats with students"() {
+        given: "question stats of execution course"
+        def questionStats = new QuestionStats(externalCourseExecution, teacherDashboard)
+        questionStatsRepository.save(questionStats)
+
+        and: "students answering quizzes in said execution course"
+        def student1 = createStudent(USER_2_NAME, USER_2_USERNAME, USER_2_EMAIL)
+        def student2 = createStudent(USER_3_NAME, USER_3_USERNAME, USER_3_EMAIL)
+        def student3 = createStudent(USER_4_NAME, USER_4_USERNAME, USER_4_EMAIL)
+        createStudent(USER_5_NAME, USER_5_USERNAME, USER_5_EMAIL) // student4, does not answer any quiz
+
+        createQuizAnswer(student1, quiz1, true)
+        createQuizAnswer(student1, quiz4, false)
+        createQuizAnswer(student2, quiz1, true)
+        createQuizAnswer(student2, quiz5, false)
+        createQuizAnswer(student3, quiz2, true)
+        createQuizAnswer(student3, quiz3, true)
+
+        when: "updating stats"
+        questionStats.update()
+
+        then: "it has correct stats values"
+        questionStats.getNumAvailable() == 2
+        questionStats.getAnsweredQuestionsUnique() == 2
+        Float.compare(questionStats.getAverageQuestionsAnswered(), 5/4) == 0
+
+        and: "string representation is correct"
         questionStats.toString() == "QuestionStats{" +
                 "id=" + questionStats.getId() +
                 ", courseExecution=" + externalCourseExecution.toString() +
@@ -102,6 +133,7 @@ class UpdateQuestionStatsTest extends SpockTest {
     def createStudent(String name, String username, String email) {
         def student = new Student(name, username, email, false, AuthUser.Type.TECNICO)
         userRepository.save(student)
+        externalCourseExecution.addUser(student)
         return student
     }
 
