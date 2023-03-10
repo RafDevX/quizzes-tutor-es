@@ -5,6 +5,8 @@ import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User
@@ -114,6 +116,62 @@ class UpdateQuizStatsTest extends SpockTest {
                 ", averageQuizzesSolved=" +
                 quizStats.getAverageQuizzesSolved() +
                 "}"
+    }
+
+    def "update quiz stats with different course executions" ()
+    {
+        given: "a second course execution"
+        def externalCourseExecution2 = new CourseExecution(externalCourse, COURSE_1_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(externalCourseExecution2)
+
+        and: "add students to the both course executions"
+        student1.addCourse(externalCourseExecution)
+        student2.addCourse(externalCourseExecution)
+        student1.addCourse(externalCourseExecution2)
+        student2.addCourse(externalCourseExecution2)
+
+        and: "create a quiz for the second course execution"
+        def quiz2 = new Quiz()
+        quiz2.setKey(3)
+        quiz2.setType(Quiz.QuizType.GENERATED.toString())
+        quiz2.setCourseExecution(externalCourseExecution2)
+        quiz2.setAvailableDate( LocalDateTime.now())
+        quizRepository.save(quiz2)
+
+        and: "create a dashboard for the first course execution"
+        createTeacherDashboard()
+
+        and: "create a dashboard for the second course execution"
+        def dashboard2 = new TeacherDashboard(externalCourseExecution2, teacher)
+        teacherDashboardRepository.save(dashboard2)
+
+        and: "create quiz stats for the first course execution"
+        createQuizStats()
+
+        and: "create quiz stats for the second course execution"
+        def quizStats2 = new QuizStats(externalCourseExecution2, dashboard)
+        quizStatsRepository.save(quizStats2)
+
+        and: "get id of the quiz of the first execution and student"
+        def studentId = student1.getId()
+        def quizId = quizRepository.findAll().get(0).getId()
+
+        and: "create a quiz answer for the first course execution"
+        answerService.createQuizAnswer(studentId, quizId)
+
+        when: ("updating statistic")
+        quizStats.update()
+        quizStats2.update()
+
+        then: "the quiz stats of the first execution has correct stats values"
+        quizStats.getNumQuizzes() == 1
+        quizStats.getUniqueQuizzesSolved() == 1
+        quizStats.getAverageQuizzesSolved() == 0.5
+
+        and: "the quiz stats of the second execution has correct stats values"
+        quizStats2.getNumQuizzes() == 1
+        quizStats2.getUniqueQuizzesSolved() == 0
+        quizStats2.getAverageQuizzesSolved() == 0
     }
 
     @TestConfiguration
