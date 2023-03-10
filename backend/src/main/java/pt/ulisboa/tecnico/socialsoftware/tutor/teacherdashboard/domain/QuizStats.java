@@ -99,6 +99,7 @@ public class QuizStats implements DomainEntity {
             .stream()
             .flatMap(student -> student.getQuizAnswers().stream())
             .map(QuizAnswer::getQuiz)
+            .filter(quiz -> quiz.getCourseExecution().equals(courseExecution))
             .distinct()
             .count();
     }
