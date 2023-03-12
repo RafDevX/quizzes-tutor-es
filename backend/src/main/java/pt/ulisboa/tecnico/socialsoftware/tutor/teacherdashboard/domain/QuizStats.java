@@ -9,6 +9,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Entity
 public class QuizStats implements DomainEntity {
@@ -95,13 +98,13 @@ public class QuizStats implements DomainEntity {
     }
 
     private void updateUniqueQuizzesSolved() {
-        this.uniqueQuizzesSolved = (int) this.courseExecution.getStudents()
-            .stream()
-            .flatMap(student -> student.getQuizAnswers().stream())
-            .map(QuizAnswer::getQuiz)
-            .filter(quiz -> quiz.getCourseExecution().equals(courseExecution))
-            .distinct()
-            .count();
+        this.uniqueQuizzesSolved = (int) this.courseExecution.getQuizzes()
+                .stream()
+                .distinct()
+                .map(Quiz::getQuizAnswers)
+                .map(answers -> answers.stream().filter(QuizAnswer::isCompleted).collect(Collectors.toSet()))
+                .filter(Predicate.not(Set::isEmpty))
+                .count();
     }
 
     private void updateAverageQuizzesSolved() {
