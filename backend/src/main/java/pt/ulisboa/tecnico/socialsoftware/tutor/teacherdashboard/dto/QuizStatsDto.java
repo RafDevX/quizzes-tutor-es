@@ -4,13 +4,13 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats
 
 public class QuizStatsDto {
 
-    private Integer id;
+    private int id;
 
-    private Integer numQuizzes;
+    private int numQuizzes;
 
-    private Integer uniqueQuizzesSolved;
+    private int uniqueQuizzesSolved;
 
-    private Float averageQuizzesSolved;
+    private float averageQuizzesSolved;
 
     public QuizStatsDto(QuizStats quizStats) {
         this.id = quizStats.getId();
@@ -19,35 +19,35 @@ public class QuizStatsDto {
         this.averageQuizzesSolved = quizStats.getAverageQuizzesSolved();
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getNumQuizzes() {
+    public int getNumQuizzes() {
         return numQuizzes;
     }
 
-    public void setNumQuizzes(Integer numQuizzes) {
+    public void setNumQuizzes(int numQuizzes) {
         this.numQuizzes = numQuizzes;
     }
 
-    public Integer getUniqueQuizzesSolved() {
+    public int getUniqueQuizzesSolved() {
         return uniqueQuizzesSolved;
     }
 
-    public void setUniqueQuizzesSolved(Integer uniqueQuizzesSolved) {
+    public void setUniqueQuizzesSolved(int uniqueQuizzesSolved) {
         this.uniqueQuizzesSolved = uniqueQuizzesSolved;
     }
 
-    public Float getAverageQuizzesSolved() {
+    public float getAverageQuizzesSolved() {
         return averageQuizzesSolved;
     }
 
-    public void setAverageQuizzesSolved(Float averageQuizzesSolved) {
+    public void setAverageQuizzesSolved(float averageQuizzesSolved) {
         this.averageQuizzesSolved = averageQuizzesSolved;
     }
 
