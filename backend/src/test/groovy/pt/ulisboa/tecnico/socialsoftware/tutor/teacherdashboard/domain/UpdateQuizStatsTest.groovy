@@ -4,6 +4,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
@@ -56,6 +57,14 @@ class UpdateQuizStatsTest extends SpockTest {
         quizRepository.save(quiz)
     }
 
+    def createQuizAnswer(Quiz quiz, Student student, boolean completed) {
+        def quizAnswer = new QuizAnswer(student, quiz)
+        quizAnswer.setCompleted(completed)
+        quizAnswerRepository.save(quizAnswer)
+
+        return quizAnswer
+    }
+
     def "update quiz stats with no students"() {
         given: "a dashboard, a user and a quiz"
         createTeacherDashboard()
@@ -87,16 +96,14 @@ class UpdateQuizStatsTest extends SpockTest {
         student1.addCourse(externalCourseExecution)
         student2.addCourse(externalCourseExecution)
 
-        and: "a dashboard, a user and a quiz"
+        and: "a dashboard"
         createTeacherDashboard()
-        def studentId = student1.getId()
-        def quizId = quizRepository.findAll().get(0).getId()
 
         and: "add quiz stats to the dashboard"
         createQuizStats()
 
         and: "create a quiz answer"
-        answerService.createQuizAnswer(studentId, quizId)
+        createQuizAnswer(quizRepository.findAll().get(0), student1, true)
 
         when: "updating statistic"
         quizStats.update()
@@ -152,12 +159,8 @@ class UpdateQuizStatsTest extends SpockTest {
         def quizStats2 = new QuizStats(externalCourseExecution2, dashboard)
         quizStatsRepository.save(quizStats2)
 
-        and: "get id of the quiz of the first execution and student"
-        def studentId = student1.getId()
-        def quizId = quizRepository.findAll().get(0).getId()
-
         and: "create a quiz answer for the first course execution"
-        answerService.createQuizAnswer(studentId, quizId)
+        createQuizAnswer(quizRepository.findAll().get(0), student1, true)
 
         when: ("updating statistic")
         quizStats.update()
