@@ -100,7 +100,6 @@ public class QuizStats implements DomainEntity {
     private void updateUniqueQuizzesSolved() {
         this.uniqueQuizzesSolved = (int) this.courseExecution.getQuizzes()
                 .stream()
-                .distinct()
                 .map(Quiz::getQuizAnswers)
                 .map(answers -> answers.stream().filter(QuizAnswer::isCompleted).count())
                 .filter(count -> count > 0)
