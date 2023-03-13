@@ -102,8 +102,8 @@ public class QuizStats implements DomainEntity {
                 .stream()
                 .distinct()
                 .map(Quiz::getQuizAnswers)
-                .map(answers -> answers.stream().filter(QuizAnswer::isCompleted).collect(Collectors.toSet()))
-                .filter(Predicate.not(Set::isEmpty))
+                .map(answers -> answers.stream().filter(QuizAnswer::isCompleted).count())
+                .filter(count -> count > 0)
                 .count();
     }
 
