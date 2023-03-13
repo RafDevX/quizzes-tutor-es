@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.repository.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.TeacherDashboardDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository;
@@ -66,8 +69,21 @@ public class TeacherDashboardService {
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
         TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);
-        teacherDashboardRepository.save(teacherDashboard);
 
+        courseExecution.getCourse()
+                        .getCourseExecutions()
+                        .stream()
+                        .filter(execution -> !courseExecution.getEndDate().isBefore(execution.getEndDate()))
+                        .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()) // sort by date descending
+                        .distinct()
+                        .limit(3)
+                        .forEach(execution -> {
+                            new StudentStats(execution, teacherDashboard);
+                            new QuizStats(execution, teacherDashboard);
+                            new QuestionStats(execution, teacherDashboard);
+                        });
+
+        teacherDashboardRepository.save(teacherDashboard);
         return new TeacherDashboardDto(teacherDashboard);
     }
 
