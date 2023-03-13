@@ -3,13 +3,9 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats;
 
 public class QuizStatsDto {
-
     private int id;
-
     private int numQuizzes;
-
     private int uniqueQuizzesSolved;
-
     private float averageQuizzesSolved;
 
     public QuizStatsDto(QuizStats quizStats) {
