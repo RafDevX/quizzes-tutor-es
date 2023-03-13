@@ -1,14 +1,17 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
+
 public class StudentStatsDto {
     private int id;
+    private String academicTerm;
     private int numStudents;
     private int numMore75CorrectQuestions;
     private int numAtLeast3Quizzes;
 
     public StudentStatsDto(StudentStats studentStats) {
         this.id = studentStats.getId();
+        this.academicTerm = studentStats.getCourseExecution().getAcademicTerm();
         this.numStudents = studentStats.getNumStudents();
         this.numMore75CorrectQuestions = studentStats.getNumMore75CorrectQuestions();
         this.numAtLeast3Quizzes = studentStats.getNumAtLeast3Quizzes();
@@ -20,6 +23,14 @@ public class StudentStatsDto {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getAcademicTerm() {
+        return academicTerm;
+    }
+
+    public void setAcademicTerm(String academicTerm) {
+        this.academicTerm = academicTerm;
     }
 
     public int getNumStudents() {
@@ -50,6 +61,7 @@ public class StudentStatsDto {
     public String toString() {
         return "StudentStatsDto{" +
                 "id=" + id +
+                ", academicTerm='" + academicTerm +
                 ", numStudents=" + numStudents +
                 ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
                 ", numAtLeast3Quizzes=" + numAtLeast3Quizzes +
