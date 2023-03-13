@@ -125,8 +125,7 @@ class UpdateQuizStatsTest extends SpockTest {
                 "}"
     }
 
-    def "update quiz stats with different course executions" ()
-    {
+    def "update quiz stats with different course executions" () {
         given: "a second course execution"
         def externalCourseExecution2 = new CourseExecution(externalCourse, COURSE_1_ACRONYM, COURSE_2_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(externalCourseExecution2)
