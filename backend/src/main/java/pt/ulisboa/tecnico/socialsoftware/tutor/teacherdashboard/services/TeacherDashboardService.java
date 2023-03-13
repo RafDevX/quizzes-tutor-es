@@ -113,4 +113,24 @@ public class TeacherDashboardService {
         teacherDashboardRepository.delete(teacherDashboard);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateAllTeacherDashboards() {
+        for (CourseExecution courseExecution : courseExecutionRepository.findAll()) {
+            for (Teacher teacher : courseExecution.getTeachers()) {
+                TeacherDashboard teacherDashboard = teacher.getDashboards()
+                        .parallelStream()
+                        .filter(dashboard -> Objects.equals(
+                                    dashboard.getCourseExecution().getId(),
+                                    courseExecution.getId()))
+                        .findAny()
+                        .orElseGet(() -> {
+                            TeacherDashboard newDashboard = new TeacherDashboard(courseExecution, teacher);
+                            return teacherDashboardRepository.save(newDashboard);
+                        });
+
+                teacherDashboard.update();
+                teacherDashboardRepository.save(teacherDashboard);
+            }
+        }
+    }
 }
