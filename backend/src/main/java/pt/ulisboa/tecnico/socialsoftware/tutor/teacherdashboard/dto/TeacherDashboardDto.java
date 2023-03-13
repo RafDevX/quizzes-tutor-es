@@ -5,24 +5,19 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDa
 import java.util.List;
 import java.util.stream.Collectors;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class TeacherDashboardDto {
     private Integer id;
     private Integer numberOfStudents;
 
+    private List<StudentStatsDto> studentStats;
     private List<QuizStatsDto> quizStats;
-
     private List<QuestionStatsDto> questionsStats;
-
-    public TeacherDashboardDto() {
-    }
 
     public TeacherDashboardDto(TeacherDashboard teacherDashboard) {
         this.id = teacherDashboard.getId();
         // For the number of students, we consider only active students
         this.numberOfStudents = teacherDashboard.getCourseExecution().getNumberOfActiveStudents();
+        this.studentStats = teacherDashboard.getStudentStats().stream().map(StudentStatsDto::new).collect(Collectors.toList());
         this.quizStats = teacherDashboard.getQuizStats().stream().map(QuizStatsDto::new).collect(Collectors.toList());
         this.questionsStats = teacherDashboard.getQuestionStats().stream().map(QuestionStatsDto::new)
                 .collect(Collectors.toList());
@@ -42,6 +37,14 @@ public class TeacherDashboardDto {
 
     public void setNumberOfStudents(Integer numberOfStudents) {
         this.numberOfStudents = numberOfStudents;
+    }
+
+    public List<StudentStatsDto> getStudentStats() {
+        return studentStats;
+    }
+
+    public void setStudentStats(List<StudentStatsDto> studentStats) {
+        this.studentStats = studentStats;
     }
 
     public List<QuizStatsDto> getQuizStats() {
@@ -65,6 +68,7 @@ public class TeacherDashboardDto {
         return "TeacherDashboardDto{" +
                 "id=" + id +
                 ", numberOfStudents=" + this.getNumberOfStudents() +
+                ", studentStats=" + this.getStudentStats() +
                 ", quizStats=" + this.getQuizStats() +
                 ", questionsStats=" + this.getQuestionsStats() +
                 "}";
