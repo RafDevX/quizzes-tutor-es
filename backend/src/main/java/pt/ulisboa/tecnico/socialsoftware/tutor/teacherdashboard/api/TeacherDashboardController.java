@@ -37,7 +37,13 @@ public class TeacherDashboardController {
         teacherDashboardService.updateAllTeacherDashboards();
     }
 
-    @DeleteMapping("/teachers/dashboards/{teacherDashboardId}/delete")
+    @PostMapping("/teachers/dashboards/{teacherDashboardId}/update")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#teacherDashboardId, 'TEACHERDASHBOARD.ACCESS')")
+    public void updateTeacherDashboard(@PathVariable int teacherDashboardId) {
+        teacherDashboardService.updateTeacherDashboard(teacherDashboardId);
+    }
+
+    @DeleteMapping("/teachers/dashboards/{teacherDashboardId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#teacherDashboardId, 'TEACHERDASHBOARD.ACCESS')")
     public void deleteTeacherDashboard(@PathVariable int teacherDashboardId) {
         teacherDashboardService.removeTeacherDashboard(teacherDashboardId);
