@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.TeacherDashboardDto;
@@ -30,10 +31,15 @@ public class TeacherDashboardController {
         return teacherDashboardService.getTeacherDashboard(courseExecutionId, teacherId);
     }
 
+    @PostMapping("/teachers/dashboards/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void updateAllTeacherDashboards() {
+        teacherDashboardService.updateAllTeacherDashboards();
+    }
+
     @DeleteMapping("/teachers/dashboards/{teacherDashboardId}/delete")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#teacherDashboardId, 'TEACHERDASHBOARD.ACCESS')")
     public void deleteTeacherDashboard(@PathVariable int teacherDashboardId) {
         teacherDashboardService.removeTeacherDashboard(teacherDashboardId);
     }
-
 }
