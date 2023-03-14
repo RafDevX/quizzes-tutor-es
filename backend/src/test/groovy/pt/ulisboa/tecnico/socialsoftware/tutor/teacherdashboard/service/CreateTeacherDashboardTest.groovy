@@ -6,32 +6,47 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 import spock.lang.Unroll
+
+import java.time.LocalDateTime
 
 @DataJpaTest
     class CreateTeacherDashboardTest extends SpockTest {
     def teacher
+    def course
 
     def setup() {
-        createExternalCourseAndExecution()
-
         teacher = new Teacher(USER_1_NAME, false)
         userRepository.save(teacher)
+
+        course = new Course(COURSE_2_NAME, Course.Type.EXTERNAL)
+        courseRepository.save(course)
     }
 
-    def "create an empty dashboard"() {
+    def createCourseExecution(String acronym, String academicTerm, LocalDateTime localDate) {
+        externalCourseExecution = new CourseExecution(course, acronym, academicTerm, Course.Type.EXTERNAL, localDate)
+        courseExecutionRepository.save(externalCourseExecution)
+
+        return externalCourseExecution
+    }
+
+    def "create a dashboard with a single course execution"() {
         given: "a teacher in a course execution"
-        teacher.addCourse(externalCourseExecution)
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        teacher.addCourse(courseExecution)
 
         when: "a dashboard is created"
-        teacherDashboardService.getTeacherDashboard(externalCourseExecution.getId(), teacher.getId())
+        teacherDashboardService.getTeacherDashboard(courseExecution.getId(), teacher.getId())
 
         then: "an empty dashboard is created"
         teacherDashboardRepository.count() == 1L
         def result = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
-        result.getCourseExecution().getId() == externalCourseExecution.getId()
+        result.getCourseExecution().getId() == courseExecution.getId()
         result.getTeacher().getId() == teacher.getId()
 
         and: "the teacher has a reference for the dashboard"
@@ -39,15 +54,50 @@ import spock.lang.Unroll
         teacher.getDashboards().contains(result)
     }
 
+    def "create a dashboard with two course executions"() {
+        given: "a teacher in two course executions"
+        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LocalDateTime.now())
+        teacher.addCourse(courseExecution1)
+        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now().minusDays(1))
+        teacher.addCourse(courseExecution2)
+
+        when: "a dashboard is created"
+        teacherDashboardService.getTeacherDashboard(courseExecution1.getId(), teacher.getId())
+        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
+
+        then: "there are exactly TWO stats within the dashboard"
+        dashboard.getQuizStats().size() == 2
+    }
+
+    def "create a dashboard with four course executions"() {
+        given: "a teacher in four course executions"
+        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LocalDateTime.now())
+        teacher.addCourse(courseExecution1)
+        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now().minusDays(1))
+        teacher.addCourse(courseExecution2)
+        def courseExecution3 = createCourseExecution(COURSE_3_ACRONYM, COURSE_3_ACADEMIC_TERM, LocalDateTime.now().minusDays(2))
+        teacher.addCourse(courseExecution3)
+        def courseExecution4 = createCourseExecution(COURSE_4_ACRONYM, COURSE_4_ACADEMIC_TERM, LocalDateTime.now().minusDays(3))
+        teacher.addCourse(courseExecution4)
+
+        when: "a dashboard is created"
+        teacherDashboardService.getTeacherDashboard(courseExecution1.getId(), teacher.getId())
+        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
+
+        then: "there are exactly THREE stats within the dashboard"
+        dashboard.getQuizStats().size() == 3
+    }
+
     def "cannot create multiple dashboards for a teacher on a course execution"() {
         given: "a teacher in a course execution"
-        teacher.addCourse(externalCourseExecution)
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        teacher.addCourse(courseExecution)
 
         and: "an empty dashboard for the teacher"
-        teacherDashboardService.createTeacherDashboard(externalCourseExecution.getId(), teacher.getId())
+        teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
 
         when: "a second dashboard is created"
-        teacherDashboardService.createTeacherDashboard(externalCourseExecution.getId(), teacher.getId())
+        teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
 
         then: "there is only one dashboard"
         teacherDashboardRepository.count() == 1L
@@ -58,8 +108,11 @@ import spock.lang.Unroll
     }
 
     def "cannot create a dashboard for a user that does not belong to the course execution"() {
+        given: "a course execution"
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+
         when: "a dashboard is created"
-        teacherDashboardService.createTeacherDashboard(externalCourseExecution.getId(), teacher.getId())
+        teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
 
         then: "exception is thrown"        
         def exception = thrown(TutorException)
@@ -81,8 +134,11 @@ import spock.lang.Unroll
 
     @Unroll
     def "cannot create a dashboard with teacherId=#teacherId"() {
+        given: "a course execution"
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+
         when: "a dashboard is created"
-        teacherDashboardService.createTeacherDashboard(externalCourseExecution.getId(), teacherId)
+        teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacherId)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
