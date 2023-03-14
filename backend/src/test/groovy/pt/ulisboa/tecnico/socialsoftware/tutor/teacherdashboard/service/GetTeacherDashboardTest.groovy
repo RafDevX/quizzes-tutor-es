@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import spock.lang.Unroll
 
+import java.time.LocalDateTime
+
 @DataJpaTest
 class GetTeacherDashboardTest extends SpockTest {
     def authUserDto
@@ -15,6 +17,7 @@ class GetTeacherDashboardTest extends SpockTest {
 
     def setup() {
         courseExecutionDto = courseService.getDemoCourse()
+        courseExecutionRepository.findAll().get(0).setEndDate(LocalDateTime.now())
         authUserDto = authUserService.demoTeacherAuth().getUser()
     }
 
