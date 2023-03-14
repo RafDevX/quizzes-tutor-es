@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 
     def "create a dashboard with a single course execution"() {
         given: "a teacher in a course execution"
-        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution)
 
         when: "a dashboard is created"
@@ -56,9 +56,9 @@ import java.time.LocalDateTime
 
     def "create a dashboard with two course executions"() {
         given: "a teacher in two course executions"
-        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution1)
-        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now().minusDays(1))
+        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_YESTERDAY)
         teacher.addCourse(courseExecution2)
 
         when: "a dashboard is created"
@@ -66,18 +66,21 @@ import java.time.LocalDateTime
         TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
 
         then: "there are exactly TWO stats within the dashboard"
-        dashboard.getQuizStats().size() == 2
+        def quizStats = dashboard.getQuizStats()
+        quizStats.size() == 2
+        quizStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        quizStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
     }
 
     def "create a dashboard with four course executions"() {
         given: "a teacher in four course executions"
-        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution1)
-        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now().minusDays(1))
+        def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_YESTERDAY)
         teacher.addCourse(courseExecution2)
-        def courseExecution3 = createCourseExecution(COURSE_3_ACRONYM, COURSE_3_ACADEMIC_TERM, LocalDateTime.now().minusDays(2))
+        def courseExecution3 = createCourseExecution(COURSE_3_ACRONYM, COURSE_3_ACADEMIC_TERM, LOCAL_DATE_LATER)
         teacher.addCourse(courseExecution3)
-        def courseExecution4 = createCourseExecution(COURSE_4_ACRONYM, COURSE_4_ACADEMIC_TERM, LocalDateTime.now().minusDays(3))
+        def courseExecution4 = createCourseExecution(COURSE_4_ACRONYM, COURSE_4_ACADEMIC_TERM, LOCAL_DATE_BEFORE)
         teacher.addCourse(courseExecution4)
 
         when: "a dashboard is created"
@@ -85,12 +88,16 @@ import java.time.LocalDateTime
         TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
 
         then: "there are exactly THREE stats within the dashboard"
-        dashboard.getQuizStats().size() == 3
+        def quizStats = dashboard.getQuizStats()
+        quizStats.size() == 3
+        quizStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        quizStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        quizStats.get(2).getCourseExecution().getId() == courseExecution4.getId()
     }
 
     def "cannot create multiple dashboards for a teacher on a course execution"() {
         given: "a teacher in a course execution"
-        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution)
 
         and: "an empty dashboard for the teacher"
@@ -109,7 +116,7 @@ import java.time.LocalDateTime
 
     def "cannot create a dashboard for a user that does not belong to the course execution"() {
         given: "a course execution"
-        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_TODAY)
 
         when: "a dashboard is created"
         teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
@@ -135,7 +142,7 @@ import java.time.LocalDateTime
     @Unroll
     def "cannot create a dashboard with teacherId=#teacherId"() {
         given: "a course execution"
-        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LocalDateTime.now())
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_TODAY)
 
         when: "a dashboard is created"
         teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacherId)
