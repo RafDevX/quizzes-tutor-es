@@ -40,6 +40,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
 
         and: "the stats are removed"
         quizStatsRepository.findAll().size() == 0
+        questionStatsRepository.findAll().size() == 0
     }
 
     def "cannot remove a dashboard twice"() {
@@ -49,6 +50,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
 
         and: "the stats are removed"
         quizStatsRepository.findAll().size() == 0
+        questionStatsRepository.findAll().size() == 0
 
         when: "the dashboard is removed for the second time"
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
@@ -65,6 +67,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
 
         and: "the stats are removed"
         quizStatsRepository.findAll().size() == 0
+        questionStatsRepository.findAll().size() == 0
 
         then: "an exception is thrown"        
         def exception = thrown(TutorException)
