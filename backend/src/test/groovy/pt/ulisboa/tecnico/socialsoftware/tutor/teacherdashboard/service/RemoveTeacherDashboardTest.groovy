@@ -39,6 +39,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
         teacher.getDashboards().size() == 0
 
         and: "the stats are removed"
+        studentStatsRepository.findAll().size() == 0
         quizStatsRepository.findAll().size() == 0
         questionStatsRepository.findAll().size() == 0
     }
@@ -49,6 +50,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
 
         and: "the stats are removed"
+        studentStatsRepository.findAll().size() == 0        
         quizStatsRepository.findAll().size() == 0
         questionStatsRepository.findAll().size() == 0
 
@@ -66,6 +68,7 @@ class RemoveTeacherDashboardTest extends SpockTest {
         teacherDashboardService.removeTeacherDashboard(dashboardId)
 
         and: "the stats are removed"
+        studentStatsRepository.findAll().size() == 0
         quizStatsRepository.findAll().size() == 0
         questionStatsRepository.findAll().size() == 0
 
