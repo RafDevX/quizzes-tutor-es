@@ -39,15 +39,22 @@ class CreateTeacherDashboardTest extends SpockTest {
         def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution)
 
-        when: "a dashboard is created"
+        when: "a user creates a dashboard"
         teacherDashboardService.getTeacherDashboard(courseExecution.getId(), teacher.getId())
 
-        then: "an empty dashboard is created"
+        then: "a dashboard is created"
         teacherDashboardRepository.count() == 1L
         def result = teacherDashboardRepository.findAll().get(0)
+        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == courseExecution.getId()
         result.getTeacher().getId() == teacher.getId()
+
+        and: "there is exactly ONE quiz stats within the dashboard"
+        def quizStats = result.getQuizStats()
+        quizStats.size() == 1
+        quizStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
 
         and: "the teacher has a reference for the dashboard"
         teacher.getDashboards().size() == 1
@@ -61,15 +68,24 @@ class CreateTeacherDashboardTest extends SpockTest {
         def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_YESTERDAY)
         teacher.addCourse(courseExecution2)
 
-        when: "a dashboard is created"
+        when: "a user creates a dashboard"
         teacherDashboardService.getTeacherDashboard(courseExecution1.getId(), teacher.getId())
-        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
 
-        then: "there are exactly TWO stats within the dashboard"
-        def quizStats = dashboard.getQuizStats()
+        then: "a dashboard is created"
+        teacherDashboardRepository.count() == 1L
+        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
+        def result = teacherDashboardRepository.findAll().get(0)
+        result.getId() != 0
+        result.getCourseExecution().getId() == courseExecution1.getId()
+        result.getTeacher().getId() == teacher.getId()
+
+        and: "there are exactly TWO quiz stats within the dashboard"
+        def quizStats = result.getQuizStats()
         quizStats.size() == 2
         quizStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
         quizStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(1).getId()) != null
     }
 
     def "create a dashboard with four course executions"() {
@@ -83,16 +99,27 @@ class CreateTeacherDashboardTest extends SpockTest {
         def courseExecution4 = createCourseExecution(COURSE_4_ACRONYM, COURSE_4_ACADEMIC_TERM, LOCAL_DATE_BEFORE)
         teacher.addCourse(courseExecution4)
 
-        when: "a dashboard is created"
+        when: "a user creates a dashboard"
         teacherDashboardService.getTeacherDashboard(courseExecution1.getId(), teacher.getId())
-        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
 
-        then: "there are exactly THREE stats within the dashboard"
+        then: "a dashboard is created"
+        teacherDashboardRepository.count() == 1L
+        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
+        def result = teacherDashboardRepository.findAll().get(0)
+        result.getId() != 0
+        result.getCourseExecution().getId() == courseExecution1.getId()
+        result.getTeacher().getId() == teacher.getId()
+
+        then: "there are exactly THREE quiz stats within the dashboard"
         def quizStats = dashboard.getQuizStats()
         quizStats.size() == 3
         quizStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
         quizStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(1).getId()) != null
         quizStats.get(2).getCourseExecution().getId() == courseExecution4.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(2).getId()) != null
+
     }
 
     def "cannot create multiple dashboards for a teacher on a course execution"() {
@@ -121,7 +148,7 @@ class CreateTeacherDashboardTest extends SpockTest {
         when: "a dashboard is created"
         teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
 
-        then: "exception is thrown"        
+        then: "exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TEACHER_NO_COURSE_EXECUTION
     }
