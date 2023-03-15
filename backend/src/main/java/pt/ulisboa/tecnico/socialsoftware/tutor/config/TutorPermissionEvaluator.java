@@ -31,6 +31,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicReposito
 import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.domain.QuestionSubmission;
 import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.repository.QuestionSubmissionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
@@ -78,6 +80,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private StudentDashboardRepository studentDashboardRepository;
+
+    @Autowired
+    private TeacherDashboardRepository teacherDashboardRepository;
 
     @Autowired
     private WeeklyScoreRepository weeklyScoreRepository;
@@ -181,6 +186,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 case "DASHBOARD.ACCESS":
                     StudentDashboard studentDashboard = studentDashboardRepository.findById(id).orElse(null);
                     return studentDashboard != null && studentDashboard.getStudent().getId().equals(userId);
+                case "TEACHERDASHBOARD.ACCESS":
+                    TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(id).orElse(null);
+                    return teacherDashboard != null && teacherDashboard.getTeacher().getId().equals(userId);
                 case "WEEKLYSCORE.ACCESS":
                     WeeklyScore weeklyScore = weeklyScoreRepository.findById(id).orElse(null);
                     return weeklyScore != null && weeklyScore.getDashboard().getStudent().getId().equals(userId);
