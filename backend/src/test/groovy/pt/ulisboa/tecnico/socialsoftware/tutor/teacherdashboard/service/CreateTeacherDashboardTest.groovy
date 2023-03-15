@@ -45,10 +45,15 @@ class CreateTeacherDashboardTest extends SpockTest {
         then: "a dashboard is created"
         teacherDashboardRepository.count() == 1L
         def result = teacherDashboardRepository.findAll().get(0)
-        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == courseExecution.getId()
         result.getTeacher().getId() == teacher.getId()
+
+        and: "there is exactly ONE student stats within the dashboard"
+        def studentsStats = result.getStudentStats()
+        studentsStats.size() == 1
+        studentsStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(0).getId()) != null
 
         and: "there is exactly ONE quiz stats within the dashboard"
         def quizStats = result.getQuizStats()
@@ -79,11 +84,18 @@ class CreateTeacherDashboardTest extends SpockTest {
 
         then: "a dashboard is created"
         teacherDashboardRepository.count() == 1L
-        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
         def result = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == courseExecution1.getId()
         result.getTeacher().getId() == teacher.getId()
+
+        and: "there are exactly TWO student stats within the dashboard"
+        def studentsStats = result.getStudentStats()
+        studentsStats.size() == 2
+        studentsStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(0).getId()) != null
+        studentsStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(1).getId()) != null
 
         and: "there are exactly TWO quiz stats within the dashboard"
         def quizStats = result.getQuizStats()
@@ -118,14 +130,23 @@ class CreateTeacherDashboardTest extends SpockTest {
 
         then: "a dashboard is created"
         teacherDashboardRepository.count() == 1L
-        TeacherDashboard dashboard = teacherDashboardRepository.findAll().get(0)
         def result = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == courseExecution1.getId()
         result.getTeacher().getId() == teacher.getId()
 
-        then: "there are exactly THREE quiz stats within the dashboard"
-        def quizStats = dashboard.getQuizStats()
+        and: "there are exactly THREE student stats within the dashboard"
+        def studentsStats = result.getStudentStats()
+        studentsStats.size() == 3
+        studentsStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(0).getId()) != null
+        studentsStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(1).getId()) != null
+        studentsStats.get(2).getCourseExecution().getId() == courseExecution4.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(2).getId()) != null
+
+        and: "there are exactly THREE stats within the dashboard"
+        def quizStats = result.getQuizStats()
         quizStats.size() == 3
         quizStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
         quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
@@ -135,7 +156,7 @@ class CreateTeacherDashboardTest extends SpockTest {
         quizStatsRepository.getReferenceById(quizStats.get(2).getId()) != null
 
         and: "there are exactly THREE question stats within the dashboard"
-        def questionStats = dashboard.getQuestionStats()
+        def questionStats = result.getQuestionStats()
         questionStats.size() == 3
         questionStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
         questionStatsRepository.getReferenceById(questionStats.get(0).getId()) != null
