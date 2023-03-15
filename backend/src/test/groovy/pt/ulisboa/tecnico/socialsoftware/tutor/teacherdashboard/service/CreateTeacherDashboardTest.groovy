@@ -15,7 +15,7 @@ import spock.lang.Unroll
 import java.time.LocalDateTime
 
 @DataJpaTest
-    class CreateTeacherDashboardTest extends SpockTest {
+class CreateTeacherDashboardTest extends SpockTest {
     def teacher
     def course
 
@@ -56,7 +56,7 @@ import java.time.LocalDateTime
 
     def "create a dashboard with two course executions"() {
         given: "a teacher in two course executions"
-        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
+        def courseExecution1 = createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution1)
         def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_YESTERDAY)
         teacher.addCourse(courseExecution2)
@@ -74,7 +74,7 @@ import java.time.LocalDateTime
 
     def "create a dashboard with four course executions"() {
         given: "a teacher in four course executions"
-        def courseExecution1= createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
+        def courseExecution1 = createCourseExecution(COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, LOCAL_DATE_TODAY)
         teacher.addCourse(courseExecution1)
         def courseExecution2 = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_YESTERDAY)
         teacher.addCourse(courseExecution2)
@@ -124,6 +124,21 @@ import java.time.LocalDateTime
         then: "exception is thrown"        
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TEACHER_NO_COURSE_EXECUTION
+    }
+
+    def "cannot create a dashboard with a course execution with null end date"() {
+        given: "a course execution with null end date"
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, null)
+        teacher.addCourse(courseExecution)
+
+        when: "a dashboard is created"
+        teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
+
+        then: "dashboard does not have stats for the course execution"
+        def dashboard = teacherDashboardRepository.findAll().get(0)
+        dashboard.getStudentStats().size() == 0
+        dashboard.getQuizStats().size() == 0
+        dashboard.getQuestionStats().size() == 0
     }
 
     @Unroll
