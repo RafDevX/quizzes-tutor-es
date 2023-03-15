@@ -37,6 +37,7 @@ class UpdateTeacherDashboardTest extends SpockTest {
 
         then: "the dashboard is updated"
         1 * dashboard.update()
+        1 * repository.save(dashboard)
     }
 
     @Unroll

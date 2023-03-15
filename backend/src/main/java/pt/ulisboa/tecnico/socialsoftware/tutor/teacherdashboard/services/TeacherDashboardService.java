@@ -108,8 +108,10 @@ public class TeacherDashboardService {
         if (dashboardId == null)
             throw new TutorException(DASHBOARD_NOT_FOUND, -1);
 
-        TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
+        TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
         teacherDashboard.update();
+        teacherDashboardRepository.save(teacherDashboard);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -117,7 +119,8 @@ public class TeacherDashboardService {
         if (dashboardId == null)
             throw new TutorException(DASHBOARD_NOT_FOUND, -1);
 
-        TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
+        TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
         teacherDashboard.remove();
         teacherDashboardRepository.delete(teacherDashboard);
     }
