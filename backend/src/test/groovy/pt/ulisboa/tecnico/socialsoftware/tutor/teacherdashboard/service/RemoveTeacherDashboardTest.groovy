@@ -19,13 +19,12 @@ class RemoveTeacherDashboardTest extends SpockTest {
         createExternalCourseAndExecution()
 
         teacher = new Teacher(USER_1_NAME, false)
+        teacher.addCourse(externalCourseExecution)
         userRepository.save(teacher)
     }
 
     def createTeacherDashboard() {
-        def dashboard = new TeacherDashboard(externalCourseExecution, teacher)
-        teacherDashboardRepository.save(dashboard)
-        return dashboard
+        return teacherDashboardService.createTeacherDashboard(externalCourseExecution.getId(), teacher.getId())
     }
 
     def "remove a dashboard"() {
@@ -36,14 +35,20 @@ class RemoveTeacherDashboardTest extends SpockTest {
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
 
         then: "the dashboard is removed"
-        teacherDashboardRepository.findAll().size() == 0L
+        teacherDashboardRepository.findAll().size() == 0
         teacher.getDashboards().size() == 0
+
+        and: "the stats are removed"
+        quizStatsRepository.findAll().size() == 0
     }
 
     def "cannot remove a dashboard twice"() {
         given: "a removed dashboard"
         def dashboard = createTeacherDashboard()
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
+
+        and: "the stats are removed"
+        quizStatsRepository.findAll().size() == 0
 
         when: "the dashboard is removed for the second time"
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
@@ -57,6 +62,9 @@ class RemoveTeacherDashboardTest extends SpockTest {
     def "cannot remove a dashboard that doesn't exist with the dashboardId=#dashboardId"() {
         when: "an incorrect dashboard id is removed"
         teacherDashboardService.removeTeacherDashboard(dashboardId)
+
+        and: "the stats are removed"
+        quizStatsRepository.findAll().size() == 0
 
         then: "an exception is thrown"        
         def exception = thrown(TutorException)
