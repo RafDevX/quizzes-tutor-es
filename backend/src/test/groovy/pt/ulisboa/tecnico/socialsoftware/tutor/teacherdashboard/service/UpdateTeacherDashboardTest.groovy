@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDa
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services.TeacherDashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
+import spock.lang.Unroll
 
 @DataJpaTest
 class UpdateTeacherDashboardTest extends SpockTest {
@@ -38,13 +39,17 @@ class UpdateTeacherDashboardTest extends SpockTest {
         1 * dashboard.update()
     }
 
-    def "cannot update a dashboard that doesn't exist"() {
+    @Unroll
+    def "cannot update a dashboard that doesn't exist with the dashboardId=#dashboardId"() {
         when: "an incorrect dashboard id is updated"
-        teacherDashboardService.updateTeacherDashboard(10)
+        teacherDashboardService.updateTeacherDashboard(dashboardId)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.DASHBOARD_NOT_FOUND
+
+        where:
+        dashboardId << [null, 10, -1]
     }
 
     @TestConfiguration
