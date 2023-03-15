@@ -73,6 +73,7 @@ public class TeacherDashboardService {
         courseExecution.getCourse()
                         .getCourseExecutions()
                         .stream()
+                        .filter(execution -> execution.getEndDate() != null)
                         .filter(execution -> !courseExecution.getEndDate().isBefore(execution.getEndDate()))
                         .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()) // sort by date descending
                         .distinct()
