@@ -56,6 +56,12 @@ class CreateTeacherDashboardTest extends SpockTest {
         quizStats.get(0).getCourseExecution().getId() == courseExecution.getId()
         quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
 
+        and: "there is exactly ONE question stats within the dashboard"
+        def questionStats = result.getQuestionStats()
+        questionStats.size() == 1
+        questionStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(0).getId()) != null
+
         and: "the teacher has a reference for the dashboard"
         teacher.getDashboards().size() == 1
         teacher.getDashboards().contains(result)
@@ -86,6 +92,14 @@ class CreateTeacherDashboardTest extends SpockTest {
         quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
         quizStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
         quizStatsRepository.getReferenceById(quizStats.get(1).getId()) != null
+
+        and: "there are exactly TWO question stats within the dashboard"
+        def questionStats = result.getQuestionStats()
+        questionStats.size() == 2
+        questionStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(0).getId()) != null
+        questionStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(1).getId()) != null
     }
 
     def "create a dashboard with four course executions"() {
@@ -120,6 +134,15 @@ class CreateTeacherDashboardTest extends SpockTest {
         quizStats.get(2).getCourseExecution().getId() == courseExecution4.getId()
         quizStatsRepository.getReferenceById(quizStats.get(2).getId()) != null
 
+        and: "there are exactly THREE question stats within the dashboard"
+        def questionStats = dashboard.getQuestionStats()
+        questionStats.size() == 3
+        questionStats.get(0).getCourseExecution().getId() == courseExecution1.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(0).getId()) != null
+        questionStats.get(1).getCourseExecution().getId() == courseExecution2.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(1).getId()) != null
+        questionStats.get(2).getCourseExecution().getId() == courseExecution4.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(2).getId()) != null
     }
 
     def "cannot create multiple dashboards for a teacher on a course execution"() {
