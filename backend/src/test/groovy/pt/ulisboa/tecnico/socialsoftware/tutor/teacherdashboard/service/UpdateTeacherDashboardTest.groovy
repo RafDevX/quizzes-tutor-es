@@ -4,6 +4,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services.TeacherDashboardService
@@ -34,6 +36,15 @@ class UpdateTeacherDashboardTest extends SpockTest {
 
         then: "the dashboard is updated"
         1 * dashboard.update()
+    }
+
+    def "cannot update a dashboard that doesn't exist"() {
+        when: "an incorrect dashboard id is updated"
+        teacherDashboardService.updateTeacherDashboard(10)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.DASHBOARD_NOT_FOUND
     }
 
     @TestConfiguration
