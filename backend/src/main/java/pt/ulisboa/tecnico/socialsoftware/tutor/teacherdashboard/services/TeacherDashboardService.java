@@ -12,6 +12,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.TeacherDashboardDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuestionStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuizStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.StudentStatsRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.TeacherRepository;
@@ -31,6 +34,15 @@ public class TeacherDashboardService {
 
     @Autowired
     private TeacherDashboardRepository teacherDashboardRepository;
+
+    @Autowired
+    private StudentStatsRepository studentStatsRepository;
+
+    @Autowired
+    private QuizStatsRepository quizStatsRepository;
+
+    @Autowired
+    private QuestionStatsRepository questionStatsRepository;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public TeacherDashboardDto getTeacherDashboard(int courseExecutionId, int teacherId) {
@@ -79,9 +91,12 @@ public class TeacherDashboardService {
                         .distinct()
                         .limit(3)
                         .forEach(execution -> {
-                            new StudentStats(execution, teacherDashboard);
-                            new QuizStats(execution, teacherDashboard);
-                            new QuestionStats(execution, teacherDashboard);
+                            final StudentStats studentStats = new StudentStats(execution, teacherDashboard);
+                            studentStatsRepository.save(studentStats);
+                            final QuizStats quizStats = new QuizStats(execution, teacherDashboard);
+                            quizStatsRepository.save(quizStats);
+                            final QuestionStats questionStats = new QuestionStats(execution, teacherDashboard);
+                            questionStatsRepository.save(questionStats);
                         });
 
         teacherDashboardRepository.save(teacherDashboard);
