@@ -7,12 +7,14 @@ public class QuestionStatsDto {
     private int numAvailable;
     private int answeredQuestionsUnique;
     private float averageQuestionsAnswered;
+    private String academicTerm;
 
     public QuestionStatsDto(QuestionStats questionStats) {
         this.id = questionStats.getId();
         this.numAvailable = questionStats.getNumAvailable();
         this.answeredQuestionsUnique = questionStats.getAnsweredQuestionsUnique();
         this.averageQuestionsAnswered = questionStats.getAverageQuestionsAnswered();
+        this.academicTerm = questionStats.getAcademicTerm();
     }
 
     public int getId() {
@@ -47,6 +49,14 @@ public class QuestionStatsDto {
         this.averageQuestionsAnswered = averageQuestionsAnswered;
     }
 
+    public String getAcademicTerm() {
+        return academicTerm;
+    }
+
+    public void setAcademicTerm(String academicTerm) {
+        this.academicTerm = academicTerm;
+    }
+
     @Override
     public String toString() {
         return "QuestionStatsDto{" +
@@ -54,6 +64,7 @@ public class QuestionStatsDto {
                 ", numAvailable=" + numAvailable +
                 ", answeredQuestionsUnique=" + answeredQuestionsUnique +
                 ", averageQuestionsAnswered=" + averageQuestionsAnswered +
+                ", academicTerm='" + academicTerm + '\'' +
                 '}';
     }
 }
