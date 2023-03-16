@@ -57,6 +57,10 @@ public class StudentStats implements DomainEntity {
         this.courseExecution = courseExecution;
     }
 
+    public String getAcademicTerm() {
+        return this.courseExecution.getAcademicTerm();
+    }
+
     public TeacherDashboard getTeacherDashboard() {
         return teacherDashboard;
     }

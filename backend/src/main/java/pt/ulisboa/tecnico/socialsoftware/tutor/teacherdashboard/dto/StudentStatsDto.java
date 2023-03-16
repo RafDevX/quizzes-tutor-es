@@ -11,7 +11,7 @@ public class StudentStatsDto {
 
     public StudentStatsDto(StudentStats studentStats) {
         this.id = studentStats.getId();
-        this.academicTerm = studentStats.getCourseExecution().getAcademicTerm();
+        this.academicTerm = studentStats.getAcademicTerm();
         this.numStudents = studentStats.getNumStudents();
         this.numMore75CorrectQuestions = studentStats.getNumMore75CorrectQuestions();
         this.numAtLeast3Quizzes = studentStats.getNumAtLeast3Quizzes();
