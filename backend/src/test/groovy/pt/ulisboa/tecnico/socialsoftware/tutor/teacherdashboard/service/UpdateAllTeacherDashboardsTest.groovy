@@ -6,7 +6,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.repository.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services.TeacherDashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 
 import java.time.LocalDateTime
@@ -53,6 +57,79 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         dashboard13 != null
         dashboard22 != null
         dashboard23 != null
+    }
+
+    def "update all teacher dashboards with no pre-existent dashboards calls update methods correctly"() {
+        given: "three mock teachers"
+        def mockTeacher1 = Mock(Teacher)
+        mockTeacher1.getId() >> 1
+        def mockTeacher2 = Mock(Teacher)
+        mockTeacher2.getId() >> 2
+        def mockTeacher3 = Mock(Teacher)
+        mockTeacher3.getId() >> 3
+
+        and: "two mock course executions"
+        def mockCourseExecution1 = Mock(CourseExecution)
+        mockCourseExecution1.getId() >> 1
+        mockCourseExecution1.getTeachers() >> [mockTeacher1, mockTeacher3]
+        def mockCourseExecution2 = Mock(CourseExecution)
+        mockCourseExecution2.getId() >> 2
+        mockCourseExecution2.getTeachers() >> [mockTeacher2, mockTeacher3]
+
+        and: "four mock teacher dashboards"
+        def mockTeacherDashboard1 = Mock(TeacherDashboard)
+        mockTeacherDashboard1.getCourseExecution() >> mockCourseExecution1
+        mockTeacherDashboard1.getTeacher() >> mockTeacher1
+        def mockTeacherDashboard2 = Mock(TeacherDashboard)
+        mockTeacherDashboard2.getCourseExecution() >> mockCourseExecution2
+        mockTeacherDashboard2.getTeacher() >> mockTeacher2
+        def mockTeacherDashboard3 = Mock(TeacherDashboard)
+        mockTeacherDashboard3.getCourseExecution() >> mockCourseExecution1
+        mockTeacherDashboard3.getTeacher() >> mockTeacher3
+        def mockTeacherDashboard4 = Mock(TeacherDashboard)
+        mockTeacherDashboard4.getCourseExecution() >> mockCourseExecution2
+        mockTeacherDashboard4.getTeacher() >> mockTeacher3
+
+        and: "mock teachers return mock teacher dashboards"
+        mockTeacher1.getDashboards() >> Set.of()
+        mockTeacher2.getDashboards() >> Set.of()
+        mockTeacher3.getDashboards() >> Set.of()
+
+        and: "a mock course execution repository"
+        def courseExecutionRepository = Mock(CourseExecutionRepository)
+        courseExecutionRepository.findAll() >> [mockCourseExecution1, mockCourseExecution2]
+
+        and: "a mock teacher dashboard repository"
+        def teacherDashboardRepository = Mock(TeacherDashboardRepository)
+        teacherDashboardRepository.findAll() >> new ArrayList<>()
+
+        and: "a teacher dashboard service that uses the mock repositories"
+        def service = new TeacherDashboardService(courseExecutionRepository: courseExecutionRepository,
+                teacherDashboardRepository: teacherDashboardRepository)
+
+        when: "all teacher dashboards are updated"
+        service.updateAllTeacherDashboards()
+
+        then: "update method is called exactly once on all teacher dashboards"
+        1 * mockTeacherDashboard1.update()
+        1 * mockTeacherDashboard2.update()
+        1 * mockTeacherDashboard3.update()
+        1 * mockTeacherDashboard4.update()
+
+        and: "save method is called correctly on teacher dashboard repository"
+        2 * teacherDashboardRepository.save({
+            it.getCourseExecution().getId() == 1 && it.getTeacher().getId() == 1
+        }) >> mockTeacherDashboard1
+        2 * teacherDashboardRepository.save({
+            it.getCourseExecution().getId() == 2 && it.getTeacher().getId() == 2
+        }) >> mockTeacherDashboard2
+        2 * teacherDashboardRepository.save({
+            it.getCourseExecution().getId() == 1 && it.getTeacher().getId() == 3
+        }) >> mockTeacherDashboard3
+        2 * teacherDashboardRepository.save({
+            it.getCourseExecution().getId() == 2 && it.getTeacher().getId() == 3
+        }) >> mockTeacherDashboard4
+        0 * teacherDashboardRepository.save(*_) >> { throw new Exception("Unexpected call to save") }
     }
 
     def createCourseExecution(String acronym, String academicTerm, LocalDateTime endDate) {
