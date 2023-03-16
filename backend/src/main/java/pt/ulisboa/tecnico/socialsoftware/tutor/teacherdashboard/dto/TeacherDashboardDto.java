@@ -11,7 +11,7 @@ public class TeacherDashboardDto {
 
     private List<StudentStatsDto> studentStats;
     private List<QuizStatsDto> quizStats;
-    private List<QuestionStatsDto> questionsStats;
+    private List<QuestionStatsDto> questionStats;
 
     public TeacherDashboardDto(TeacherDashboard teacherDashboard) {
         this.id = teacherDashboard.getId();
@@ -19,7 +19,7 @@ public class TeacherDashboardDto {
         this.numberOfStudents = teacherDashboard.getCourseExecution().getNumberOfActiveStudents();
         this.studentStats = teacherDashboard.getStudentStats().stream().map(StudentStatsDto::new).collect(Collectors.toList());
         this.quizStats = teacherDashboard.getQuizStats().stream().map(QuizStatsDto::new).collect(Collectors.toList());
-        this.questionsStats = teacherDashboard.getQuestionStats().stream().map(QuestionStatsDto::new)
+        this.questionStats = teacherDashboard.getQuestionStats().stream().map(QuestionStatsDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -55,12 +55,12 @@ public class TeacherDashboardDto {
         this.quizStats = quizStats;
     }
 
-    public List<QuestionStatsDto> getQuestionsStats() {
-        return questionsStats;
+    public List<QuestionStatsDto> getQuestionStats() {
+        return questionStats;
     }
 
-    public void setQuestionsStats(List<QuestionStatsDto> questionsStats) {
-        this.questionsStats = questionsStats;
+    public void setQuestionStats(List<QuestionStatsDto> questionStats) {
+        this.questionStats = questionStats;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TeacherDashboardDto {
                 ", numberOfStudents=" + this.getNumberOfStudents() +
                 ", studentStats=" + this.getStudentStats() +
                 ", quizStats=" + this.getQuizStats() +
-                ", questionsStats=" + this.getQuestionsStats() +
+                ", questionsStats=" + this.getQuestionStats() +
                 "}";
     }
 }
