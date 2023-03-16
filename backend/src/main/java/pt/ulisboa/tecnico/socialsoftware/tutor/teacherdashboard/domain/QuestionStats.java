@@ -10,7 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 
-
 @Entity
 public class QuestionStats implements DomainEntity {
 
@@ -32,7 +31,6 @@ public class QuestionStats implements DomainEntity {
 
     @ManyToOne
     private TeacherDashboard teacherDashboard;
-
 
     public QuestionStats() {
     }
@@ -58,6 +56,10 @@ public class QuestionStats implements DomainEntity {
 
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
+    }
+
+    public String getAcademicTerm() {
+        return this.courseExecution.getAcademicTerm();
     }
 
     public TeacherDashboard getTeacherDashboard() {
@@ -113,16 +115,14 @@ public class QuestionStats implements DomainEntity {
                 .flatMap(quiz -> quiz.getQuizAnswers().stream())
                 .filter(QuizAnswer::isCompleted)
                 .collect(Collectors.groupingBy(
-                        QuizAnswer::getStudent
-                ))
+                        QuizAnswer::getStudent))
                 .values()
                 .stream()
                 .map(answers -> answers.stream()
                         .flatMap(quizAnswer -> quizAnswer.getQuestionAnswers().stream())
                         .map(QuestionAnswer::getQuestion)
                         .distinct()
-                        .count()
-                )
+                        .count())
                 .reduce(0L, Long::sum);
 
         this.averageQuestionsAnswered = totalStudents == 0 ? 0.0f : (float) totalAnsweredQuestions / totalStudents;
