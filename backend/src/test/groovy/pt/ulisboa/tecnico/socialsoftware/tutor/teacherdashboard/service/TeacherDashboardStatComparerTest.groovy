@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.service
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.StudentStatsDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.QuizStatsDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.QuestionStatsDto
 
@@ -19,6 +21,21 @@ class TeacherDashboardStatComparerTest extends SpockTest {
                 ", numMore75CorrectQuestions=" + studentStats.getNumMore75CorrectQuestions() +
                 ", numAtLeast3Quizzes=" + studentStats.getNumAtLeast3Quizzes() +
                 ", academicTerm='" + studentStats.getAcademicTerm() + '\'' +
+                '}'
+    }
+
+    def compareQuizStats(QuizStatsDto quizStatsDto, QuizStats quizStats) {
+        quizStatsDto.getId() == quizStats.getId()
+        quizStatsDto.getNumQuizzes() == quizStats.getNumQuizzes()
+        quizStatsDto.getUniqueQuizzesSolved() == quizStats.getUniqueQuizzesSolved()
+        quizStatsDto.getAverageQuizzesSolved() == quizStats.getAverageQuizzesSolved()
+        quizStatsDto.getAcademicTerm() == quizStats.getAcademicTerm()
+        quizStatsDto.toString() == "QuizStatsDto{" +
+                "id=" + quizStats.getId() +
+                ", numQuizzes=" + quizStats.getNumQuizzes() +
+                ", uniqueQuizzesSolved=" + quizStats.getUniqueQuizzesSolved() +
+                ", averageQuizzesSolved=" + quizStats.getAverageQuizzesSolved() +
+                ", academicTerm='" + quizStats.getAcademicTerm() + '\'' +
                 '}'
     }
     
