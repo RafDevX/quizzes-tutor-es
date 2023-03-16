@@ -75,6 +75,9 @@ class CreateTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboardDto.getStudentStats().eachWithIndex { stat, i ->
             compareStudentStats(stat, teacherDashboard.getStudentStats().get(i))
         }
+        teacherDashboardDto.getQuizStats().eachWithIndex { stat, i ->
+            compareQuizStats(stat, teacherDashboard.getQuizStats().get(i))
+        }
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
