@@ -39,6 +39,9 @@ class GetTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         and: "the returned DTO is correct"
         teacherDashboardDto.getId() == teacherDashboard.getId()
         teacherDashboardDto.getNumberOfStudents() == teacherDashboard.getCourseExecution().getNumberOfActiveStudents()
+        teacherDashboardDto.getStudentStats().eachWithIndex{  stat,  i ->
+            compareStudentStats(stat, teacherDashboard.getStudentStats().get(i))
+        }
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
