@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDa
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services.TeacherDashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
+import spock.lang.Unroll
 
 import java.time.LocalDateTime
 
@@ -59,7 +60,8 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         dashboard23 != null
     }
 
-    def "update all teacher dashboards with no pre-existent dashboards calls update methods correctly"() {
+    @Unroll
+    def "update all teacher dashboards calls update methods"() {
         given: "three mock teachers"
         def mockTeacher1 = Mock(Teacher)
         mockTeacher1.getId() >> 1
@@ -91,9 +93,12 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         mockTeacherDashboard4.getTeacher() >> mockTeacher3
 
         and: "mock teachers return mock teacher dashboards"
-        mockTeacher1.getDashboards() >> Set.of()
-        mockTeacher2.getDashboards() >> Set.of()
-        mockTeacher3.getDashboards() >> Set.of()
+        mockTeacher1.getDashboards() >> buildSet([mockTeacherDashboard1], [dashboard1AlreadyExists])
+        mockTeacher2.getDashboards() >> buildSet([mockTeacherDashboard2], [dashboard2AlreadyExists])
+        mockTeacher3.getDashboards() >> buildSet(
+                [mockTeacherDashboard3, mockTeacherDashboard4],
+                [dashboard3AlreadyExists, dashboard4AlreadyExists]
+        )
 
         and: "a mock course execution repository"
         def courseExecutionRepository = Mock(CourseExecutionRepository)
@@ -101,7 +106,10 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
 
         and: "a mock teacher dashboard repository"
         def teacherDashboardRepository = Mock(TeacherDashboardRepository)
-        teacherDashboardRepository.findAll() >> new ArrayList<>()
+        teacherDashboardRepository.findAll() >> buildSet(
+                [mockTeacherDashboard1, mockTeacherDashboard2, mockTeacherDashboard3, mockTeacherDashboard4],
+                [dashboard1AlreadyExists, dashboard2AlreadyExists, dashboard3AlreadyExists, dashboard4AlreadyExists]
+        )
 
         and: "a teacher dashboard service that uses the mock repositories"
         def service = new TeacherDashboardService(courseExecutionRepository: courseExecutionRepository,
@@ -117,19 +125,27 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         1 * mockTeacherDashboard4.update()
 
         and: "save method is called correctly on teacher dashboard repository"
-        2 * teacherDashboardRepository.save({
+        (dashboard1AlreadyExists ? 1 : 2) * teacherDashboardRepository.save({
             it.getCourseExecution().getId() == 1 && it.getTeacher().getId() == 1
         }) >> mockTeacherDashboard1
-        2 * teacherDashboardRepository.save({
+        (dashboard2AlreadyExists ? 1 : 2) * teacherDashboardRepository.save({
             it.getCourseExecution().getId() == 2 && it.getTeacher().getId() == 2
         }) >> mockTeacherDashboard2
-        2 * teacherDashboardRepository.save({
+        (dashboard3AlreadyExists ? 1 : 2) * teacherDashboardRepository.save({
             it.getCourseExecution().getId() == 1 && it.getTeacher().getId() == 3
         }) >> mockTeacherDashboard3
-        2 * teacherDashboardRepository.save({
+        (dashboard4AlreadyExists ? 1 : 2) * teacherDashboardRepository.save({
             it.getCourseExecution().getId() == 2 && it.getTeacher().getId() == 3
         }) >> mockTeacherDashboard4
         0 * teacherDashboardRepository.save(*_) >> { throw new Exception("Unexpected call to save") }
+
+        where:
+        dashboard1AlreadyExists | dashboard2AlreadyExists | dashboard3AlreadyExists | dashboard4AlreadyExists
+        false                   | false                   | false                   | false
+        true                    | false                   | false                   | false
+        true                    | true                    | false                   | false
+        true                    | true                    | true                    | false
+        true                    | true                    | true                    | true
     }
 
     def createCourseExecution(String acronym, String academicTerm, LocalDateTime endDate) {
@@ -150,6 +166,16 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
     def addTeacherToCourseExecution(Teacher teacher, CourseExecution courseExecution) {
         courseExecution.addUser(teacher)
         courseExecutionRepository.save(courseExecution)
+    }
+
+    static <T> Set<T> buildSet(List<T> objs, List<Boolean> includeConds) {
+        Set<T> set = new HashSet<>()
+        objs.eachWithIndex { obj, i ->
+            if (includeConds[i]) {
+                set.add(obj)
+            }
+        }
+        return set
     }
 
     @TestConfiguration
