@@ -81,6 +81,13 @@ class CreateTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
+        teacherDashboardDto.toString() == "TeacherDashboardDto{" +
+                "id=" + teacherDashboard.getId() +
+                ", numberOfStudents=" + teacherDashboard.getCourseExecution().getNumberOfActiveStudents() +
+                ", studentStats=" + teacherDashboardDto.getStudentStats() +
+                ", quizStats=" + teacherDashboardDto.getQuizStats() +
+                ", questionsStats=" + teacherDashboardDto.getQuestionStats() +
+                "}"
     }
 
     def "create a dashboard with two course executions"() {
@@ -136,6 +143,13 @@ class CreateTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
+        teacherDashboardDto.toString() == "TeacherDashboardDto{" +
+                "id=" + teacherDashboard.getId() +
+                ", numberOfStudents=" + teacherDashboard.getCourseExecution().getNumberOfActiveStudents() +
+                ", studentStats=" + teacherDashboardDto.getStudentStats() +
+                ", quizStats=" + teacherDashboardDto.getQuizStats() +
+                ", questionsStats=" + teacherDashboardDto.getQuestionStats() +
+                "}"
     }
 
     def "create a dashboard with four course executions"() {
@@ -201,6 +215,13 @@ class CreateTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
+        teacherDashboardDto.toString() == "TeacherDashboardDto{" +
+                "id=" + teacherDashboard.getId() +
+                ", numberOfStudents=" + teacherDashboard.getCourseExecution().getNumberOfActiveStudents() +
+                ", studentStats=" + teacherDashboardDto.getStudentStats() +
+                ", quizStats=" + teacherDashboardDto.getQuizStats() +
+                ", questionsStats=" + teacherDashboardDto.getQuestionStats() +
+                "}"
     }
 
     def "cannot create multiple dashboards for a teacher on a course execution"() {

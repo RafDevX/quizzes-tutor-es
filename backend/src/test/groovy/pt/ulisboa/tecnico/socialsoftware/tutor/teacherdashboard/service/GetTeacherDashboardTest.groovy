@@ -48,6 +48,13 @@ class GetTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
             compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
         }
+        teacherDashboardDto.toString() == "TeacherDashboardDto{" +
+                "id=" + teacherDashboard.getId() +
+                ", numberOfStudents=" + teacherDashboard.getCourseExecution().getNumberOfActiveStudents() +
+                ", studentStats=" + teacherDashboardDto.getStudentStats() +
+                ", quizStats=" + teacherDashboardDto.getQuizStats() +
+                ", questionsStats=" + teacherDashboardDto.getQuestionStats() +
+                "}"
     }
 
     def "get a dashboard and it already exists"() {
