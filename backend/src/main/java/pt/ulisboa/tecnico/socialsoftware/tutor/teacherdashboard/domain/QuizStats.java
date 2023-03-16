@@ -5,13 +5,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Entity
 public class QuizStats implements DomainEntity {
@@ -59,6 +55,10 @@ public class QuizStats implements DomainEntity {
 
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
+    }
+
+    public String getAcademicTerm() {
+        return this.courseExecution.getAcademicTerm();
     }
 
     public TeacherDashboard getTeacherDashboard() {
