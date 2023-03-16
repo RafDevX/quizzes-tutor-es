@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.service
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
-import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import spock.lang.Unroll
@@ -11,7 +10,7 @@ import spock.lang.Unroll
 import java.time.LocalDateTime
 
 @DataJpaTest
-class GetTeacherDashboardTest extends SpockTest {
+class GetTeacherDashboardTest extends TeacherDashboardStatComparerTest {
     def authUserDto
     def courseExecutionDto
 
@@ -23,19 +22,26 @@ class GetTeacherDashboardTest extends SpockTest {
 
     def "get a dashboard when dashboard does not exist"() {
         when: "getting a dashboard"
-        teacherDashboardService.getTeacherDashboard(courseExecutionDto.getCourseExecutionId(), authUserDto.getId())
+        def teacherDashboardDto = teacherDashboardService.getTeacherDashboard(courseExecutionDto.getCourseExecutionId(), authUserDto.getId())
 
         then: "an empty dashboard is created"
         teacherDashboardRepository.count() == 1L
-        def result = teacherDashboardRepository.findAll().get(0)
-        result.getId() != 0
-        result.getCourseExecution().getId() == courseExecutionDto.getCourseExecutionId()
-        result.getTeacher().getId() == authUserDto.getId()
+        def teacherDashboard = teacherDashboardRepository.findAll().get(0)
+        teacherDashboard.getId() != 0
+        teacherDashboard.getCourseExecution().getId() == courseExecutionDto.getCourseExecutionId()
+        teacherDashboard.getTeacher().getId() == authUserDto.getId()
 
         and: "the teacher has a reference for the dashboard"
         def teacher = userRepository.getById(authUserDto.getId())
         teacher.getDashboards().size() == 1
-        teacher.getDashboards().contains(result)
+        teacher.getDashboards().contains(teacherDashboard)
+
+        and: "the returned DTO is correct"
+        teacherDashboardDto.getId() == teacherDashboard.getId()
+        teacherDashboardDto.getNumberOfStudents() == teacherDashboard.getCourseExecution().getNumberOfActiveStudents()
+        teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
+            compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
+        }
     }
 
     def "get a dashboard and it already exists"() {
