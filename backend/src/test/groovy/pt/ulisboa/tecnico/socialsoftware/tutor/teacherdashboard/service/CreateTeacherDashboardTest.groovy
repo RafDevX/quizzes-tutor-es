@@ -202,14 +202,15 @@ class CreateTeacherDashboardTest extends SpockTest {
         def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, null)
         teacher.addCourse(courseExecution)
 
+        and: "a course execution with a non-null end date"
+        createCourseExecution(COURSE_3_ACRONYM, COURSE_3_ACADEMIC_TERM, LOCAL_DATE_BEFORE)
+
         when: "a dashboard is created"
         teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
 
-        then: "dashboard does not have stats for the course execution"
-        def dashboard = teacherDashboardRepository.findAll().get(0)
-        dashboard.getStudentStats().size() == 0
-        dashboard.getQuizStats().size() == 0
-        dashboard.getQuestionStats().size() == 0
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NO_END_DATE
     }
 
     @Unroll
