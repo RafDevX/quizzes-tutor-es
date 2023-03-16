@@ -7,12 +7,14 @@ public class QuizStatsDto {
     private int numQuizzes;
     private int uniqueQuizzesSolved;
     private float averageQuizzesSolved;
+    private String academicTerm;
 
     public QuizStatsDto(QuizStats quizStats) {
         this.id = quizStats.getId();
         this.numQuizzes = quizStats.getNumQuizzes();
         this.uniqueQuizzesSolved = quizStats.getUniqueQuizzesSolved();
         this.averageQuizzesSolved = quizStats.getAverageQuizzesSolved();
+        this.academicTerm = quizStats.getAcademicTerm();
     }
 
     public int getId() {
@@ -47,6 +49,10 @@ public class QuizStatsDto {
         this.averageQuizzesSolved = averageQuizzesSolved;
     }
 
+    public String getAcademicTerm() { return academicTerm; }
+
+    public void setAcademicTerm(String academicTerm) { this.academicTerm = academicTerm; }
+
     @Override
     public String toString() {
         return "QuizStatsDto{" +
@@ -54,6 +60,7 @@ public class QuizStatsDto {
             ", numQuizzes=" + numQuizzes +
             ", uniqueQuizzesSolved=" + uniqueQuizzesSolved +
             ", averageQuizzesSolved=" + averageQuizzesSolved +
+            ", academicTerm=" + academicTerm + '\'' +
             '}';
     }
 }
