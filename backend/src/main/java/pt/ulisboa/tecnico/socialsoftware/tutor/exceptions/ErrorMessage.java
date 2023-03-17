@@ -35,7 +35,7 @@ public enum ErrorMessage {
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND_STR("Course execution not found with id %s"),
     COURSE_EXECUTION_NOT_EXTERNAL("The course execution with id %d is not external"),
-    COURSE_EXECUTION_NO_END_DATE("Course execution does not have an end date"),
+    COURSE_EXECUTION_NO_END_DATE("Course execution with id %d does not have an end date"),
     INVALID_EMAIL("The mail %s is invalid."),
     INVALID_PASSWORD("The password %s is invalid."),
     INVALID_ROLE("The Role %s is invalid."),

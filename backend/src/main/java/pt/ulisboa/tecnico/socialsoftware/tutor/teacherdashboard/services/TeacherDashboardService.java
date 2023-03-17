@@ -81,7 +81,7 @@ public class TeacherDashboardService {
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
         if (courseExecution.getEndDate() == null) {
-            throw new TutorException(COURSE_EXECUTION_NO_END_DATE);
+            throw new TutorException(COURSE_EXECUTION_NO_END_DATE, courseExecution.getId());
         }
 
         TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);
