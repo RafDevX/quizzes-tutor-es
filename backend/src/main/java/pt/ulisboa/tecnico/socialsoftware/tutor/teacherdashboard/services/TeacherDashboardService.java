@@ -54,13 +54,12 @@ public class TeacherDashboardService {
         if (!teacher.getCourseExecutions().contains(courseExecution))
             throw new TutorException(TEACHER_NO_COURSE_EXECUTION);
 
-        Optional<TeacherDashboard> dashboardOptional = teacher.getDashboards().stream()
+        TeacherDashboard teacherDashboard = teacher.getDashboards().stream()
                 .filter(dashboard -> dashboard.getCourseExecution().getId().equals(courseExecutionId))
-                .findAny();
+                .findAny()
+                .orElseGet(() -> createAndReturnTeacherDashboard(courseExecution, teacher));
 
-        return dashboardOptional.
-                map(TeacherDashboardDto::new).
-                orElseGet(() -> createAndReturnTeacherDashboardDto(courseExecution, teacher));
+        return new TeacherDashboardDto(teacherDashboard);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -76,10 +75,10 @@ public class TeacherDashboardService {
         if (!teacher.getCourseExecutions().contains(courseExecution))
             throw new TutorException(TEACHER_NO_COURSE_EXECUTION);
 
-        return createAndReturnTeacherDashboardDto(courseExecution, teacher);
+        return new TeacherDashboardDto(createAndReturnTeacherDashboard(courseExecution, teacher));
     }
 
-    private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
+    private TeacherDashboard createAndReturnTeacherDashboard(CourseExecution courseExecution, Teacher teacher) {
         if (courseExecution.getEndDate() == null) {
             throw new TutorException(COURSE_EXECUTION_NO_END_DATE, courseExecution.getId());
         }
@@ -103,8 +102,7 @@ public class TeacherDashboardService {
                             questionStatsRepository.save(questionStats);
                         });
 
-        teacherDashboardRepository.save(teacherDashboard);
-        return new TeacherDashboardDto(teacherDashboard);
+        return teacherDashboardRepository.save(teacherDashboard);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
