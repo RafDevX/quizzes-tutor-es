@@ -137,10 +137,7 @@ public class TeacherDashboardService {
                                     dashboard.getCourseExecution().getId(),
                                     courseExecution.getId()))
                         .findAny()
-                        .orElseGet(() -> {
-                            TeacherDashboard newDashboard = new TeacherDashboard(courseExecution, teacher);
-                            return teacherDashboardRepository.save(newDashboard);
-                        });
+                        .orElseGet(() -> createAndReturnTeacherDashboard(courseExecution, teacher));
 
                 teacherDashboard.update();
                 teacherDashboardRepository.save(teacherDashboard);
