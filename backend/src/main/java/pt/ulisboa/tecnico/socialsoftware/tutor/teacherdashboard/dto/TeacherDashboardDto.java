@@ -70,7 +70,7 @@ public class TeacherDashboardDto {
                 ", numberOfStudents=" + this.getNumberOfStudents() +
                 ", studentStats=" + this.getStudentStats() +
                 ", quizStats=" + this.getQuizStats() +
-                ", questionsStats=" + this.getQuestionStats() +
+                ", questionStats=" + this.getQuestionStats() +
                 "}";
     }
 }

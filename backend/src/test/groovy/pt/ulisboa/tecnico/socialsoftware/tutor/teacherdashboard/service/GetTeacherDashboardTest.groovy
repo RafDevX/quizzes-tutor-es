@@ -53,7 +53,7 @@ class GetTeacherDashboardTest extends TeacherDashboardStatComparerTest {
                 ", numberOfStudents=" + teacherDashboard.getCourseExecution().getNumberOfActiveStudents() +
                 ", studentStats=" + teacherDashboardDto.getStudentStats() +
                 ", quizStats=" + teacherDashboardDto.getQuizStats() +
-                ", questionsStats=" + teacherDashboardDto.getQuestionStats() +
+                ", questionStats=" + teacherDashboardDto.getQuestionStats() +
                 "}"
     }
 
