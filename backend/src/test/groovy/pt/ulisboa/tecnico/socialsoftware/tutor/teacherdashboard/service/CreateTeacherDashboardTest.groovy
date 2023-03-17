@@ -280,6 +280,73 @@ class CreateTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NO_END_DATE
     }
 
+    def "cannot create a dashboard with a course execution whose other executions of the same course have a null end date"() {
+        given: "a course execution with a non-null end date"
+        def courseExecution = createCourseExecution(COURSE_2_ACRONYM, COURSE_2_ACADEMIC_TERM, LOCAL_DATE_BEFORE)
+        teacher.addCourse(courseExecution)
+
+        and: "a course execution with a null end date"
+        createCourseExecution(COURSE_3_ACRONYM, COURSE_3_ACADEMIC_TERM, null)
+
+        when: "a user creates a dashboard"
+        def teacherDashboardDto = teacherDashboardService.createTeacherDashboard(courseExecution.getId(), teacher.getId())
+
+        then: "a dashboard is created"
+        teacherDashboardRepository.count() == 1L
+        def teacherDashboard = teacherDashboardRepository.findAll().get(0)
+        teacherDashboard.getId() != null
+        teacherDashboard.getCourseExecution().getId() == courseExecution.getId()
+        teacherDashboard.getTeacher().getId() == teacher.getId()
+
+        and: "there is exactly ONE student stats within the dashboard"
+        def studentsStats = teacherDashboard.getStudentStats()
+        studentsStats.size() == 1
+        studentsStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        studentStatsRepository.getReferenceById(studentsStats.get(0).getId()) != null
+
+        and: "there is exactly ONE quiz stats within the dashboard"
+        def quizStats = teacherDashboard.getQuizStats()
+        quizStats.size() == 1
+        quizStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        quizStatsRepository.getReferenceById(quizStats.get(0).getId()) != null
+
+        and: "there is exactly ONE question stats within the dashboard"
+        def questionStats = teacherDashboard.getQuestionStats()
+        questionStats.size() == 1
+        questionStats.get(0).getCourseExecution().getId() == courseExecution.getId()
+        questionStatsRepository.getReferenceById(questionStats.get(0).getId()) != null
+
+        and: "the teacher has a reference for the dashboard"
+        teacher.getDashboards().size() == 1
+        teacher.getDashboards().contains(teacherDashboard)
+
+        and: "the returned DTO is correct"
+        teacherDashboardDto.getId() == teacherDashboard.getId()
+        teacherDashboardDto.getNumberOfStudents() == 0
+        teacherDashboardDto.getStudentStats().size() == 1
+        teacherDashboardDto.getStudentStats().eachWithIndex { statDto, i ->
+            def stat = teacherDashboard.getStudentStats().get(i)
+            compareStudentStats(statDto, stat.getId(), 0, 0, 0, stat.getAcademicTerm())
+        }
+        teacherDashboardDto.getQuizStats().size() == 1
+        teacherDashboardDto.getQuizStats().eachWithIndex { statDto, i ->
+            def stat = teacherDashboard.getQuizStats().get(i)
+            compareQuizStats(statDto, stat.getId(), 0, 0, 0.0f, stat.getAcademicTerm())
+        }
+        teacherDashboardDto.getQuestionStats().size() == 1
+        teacherDashboardDto.getQuestionStats().eachWithIndex { statDto, i ->
+            def stat = teacherDashboard.getQuestionStats().get(i)
+            compareQuestionStats(statDto, stat.getId(), 0, 0, 0.0f, stat.getAcademicTerm())
+        }
+        teacherDashboardDto.toString() == "TeacherDashboardDto{" +
+                "id=" + teacherDashboard.getId() +
+                ", numberOfStudents=0" +
+                ", studentStats=" + teacherDashboardDto.getStudentStats() +
+                ", quizStats=" + teacherDashboardDto.getQuizStats() +
+                ", questionStats=" + teacherDashboardDto.getQuestionStats() +
+                "}"
+    }
+
     @Unroll
     def "cannot create a dashboard with courseExecutionId=#courseExecutionId"() {
         when: "a dashboard is created"
