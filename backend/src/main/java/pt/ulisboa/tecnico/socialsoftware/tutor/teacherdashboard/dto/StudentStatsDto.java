@@ -61,7 +61,7 @@ public class StudentStatsDto {
     public String toString() {
         return "StudentStatsDto{" +
                 "id=" + id +
-                ", academicTerm='" + academicTerm +
+                ", academicTerm='" + academicTerm + '\'' +
                 ", numStudents=" + numStudents +
                 ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
                 ", numAtLeast3Quizzes=" + numAtLeast3Quizzes +

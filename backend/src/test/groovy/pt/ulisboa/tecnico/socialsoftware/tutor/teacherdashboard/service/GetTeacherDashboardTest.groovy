@@ -32,21 +32,24 @@ class GetTeacherDashboardTest extends TeacherDashboardStatComparerTest {
         teacherDashboard.getTeacher().getId() == authUserDto.getId()
 
         and: "the teacher has a reference for the dashboard"
-        def teacher = userRepository.getById(authUserDto.getId())
+        def teacher = userRepository.getReferenceById(authUserDto.getId())
         teacher.getDashboards().size() == 1
         teacher.getDashboards().contains(teacherDashboard)
 
         and: "the returned DTO is correct"
         teacherDashboardDto.getId() == teacherDashboard.getId()
         teacherDashboardDto.getNumberOfStudents() == teacherDashboard.getCourseExecution().getNumberOfActiveStudents()
-        teacherDashboardDto.getStudentStats().eachWithIndex{  stat,  i ->
-            compareStudentStats(stat, teacherDashboard.getStudentStats().get(i))
+        teacherDashboardDto.getStudentStats().eachWithIndex{  statDto,  i ->
+            def stat = teacherDashboard.getStudentStats().get(i)
+            compareStudentStats(statDto, stat.getId(), 0, 0, 0, stat.getAcademicTerm())
         }
-        teacherDashboardDto.getQuizStats().eachWithIndex { stat, i ->
-            compareQuizStats(stat, teacherDashboard.getQuizStats().get(i))
+        teacherDashboardDto.getQuizStats().eachWithIndex { statDto, i ->
+            def stat = teacherDashboard.getQuizStats().get(i)
+            compareQuizStats(statDto, stat.getId(), 0, 0, 0.0f, stat.getAcademicTerm())
         }
-        teacherDashboardDto.getQuestionStats().eachWithIndex { stat, i ->
-            compareQuestionStats(stat, teacherDashboard.getQuestionStats().get(i))
+        teacherDashboardDto.getQuestionStats().eachWithIndex { statDto, i ->
+            def stat = teacherDashboard.getQuestionStats().get(i)
+            compareQuestionStats(statDto, stat.getId(), 0, 0, 0.0f, stat.getAcademicTerm())
         }
         teacherDashboardDto.toString() == "TeacherDashboardDto{" +
                 "id=" + teacherDashboard.getId() +

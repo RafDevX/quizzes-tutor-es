@@ -9,48 +9,48 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionS
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.QuestionStatsDto
 
 class TeacherDashboardStatComparerTest extends SpockTest {
-    def compareStudentStats(StudentStatsDto studentStatsDto, StudentStats studentStats) {
-        studentStatsDto.getId() == studentStats.getId()
-        studentStatsDto.getNumStudents() == studentStats.getNumStudents()
-        studentStatsDto.getNumMore75CorrectQuestions() == studentStats.getNumMore75CorrectQuestions()
-        studentStatsDto.getNumAtLeast3Quizzes() == studentStats.getNumAtLeast3Quizzes()
-        studentStatsDto.getAcademicTerm() == studentStats.getAcademicTerm()
-        studentStatsDto.toString() == "QuestionStatsDto{" +
-                "id=" + studentStats.getId() +
-                ", numStudents=" + studentStats.getNumStudents() +
-                ", numMore75CorrectQuestions=" + studentStats.getNumMore75CorrectQuestions() +
-                ", numAtLeast3Quizzes=" + studentStats.getNumAtLeast3Quizzes() +
-                ", academicTerm='" + studentStats.getAcademicTerm() + '\'' +
+    def compareStudentStats(StudentStatsDto studentStatsDto, id, numStudents, numMore75CorrectQuestions, numAtLeast3Quizzes, academicTerm) {
+        assert studentStatsDto.getId() == id
+        assert studentStatsDto.getNumStudents() == numStudents
+        assert studentStatsDto.getNumMore75CorrectQuestions() == numMore75CorrectQuestions
+        assert studentStatsDto.getNumAtLeast3Quizzes() == numAtLeast3Quizzes
+        assert studentStatsDto.getAcademicTerm() == academicTerm
+        assert studentStatsDto.toString() == "StudentStatsDto{" +
+                "id=" + id +
+                ", academicTerm='" + academicTerm + '\'' +
+                ", numStudents=" + numStudents +
+                ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
+                ", numAtLeast3Quizzes=" + numAtLeast3Quizzes +
                 '}'
     }
 
-    def compareQuizStats(QuizStatsDto quizStatsDto, QuizStats quizStats) {
-        quizStatsDto.getId() == quizStats.getId()
-        quizStatsDto.getNumQuizzes() == quizStats.getNumQuizzes()
-        quizStatsDto.getUniqueQuizzesSolved() == quizStats.getUniqueQuizzesSolved()
-        quizStatsDto.getAverageQuizzesSolved() == quizStats.getAverageQuizzesSolved()
-        quizStatsDto.getAcademicTerm() == quizStats.getAcademicTerm()
-        quizStatsDto.toString() == "QuizStatsDto{" +
-                "id=" + quizStats.getId() +
-                ", numQuizzes=" + quizStats.getNumQuizzes() +
-                ", uniqueQuizzesSolved=" + quizStats.getUniqueQuizzesSolved() +
-                ", averageQuizzesSolved=" + quizStats.getAverageQuizzesSolved() +
-                ", academicTerm='" + quizStats.getAcademicTerm() + '\'' +
+    def compareQuizStats(QuizStatsDto quizStatsDto, id, numQuizzes, uniqueQuizzesSolved, averageQuizzesSolved, academicTerm) {
+        assert quizStatsDto.getId() == id
+        assert quizStatsDto.getNumQuizzes() == numQuizzes
+        assert quizStatsDto.getUniqueQuizzesSolved() == uniqueQuizzesSolved
+        assert quizStatsDto.getAverageQuizzesSolved() == averageQuizzesSolved
+        assert quizStatsDto.getAcademicTerm() == academicTerm
+        assert quizStatsDto.toString() == "QuizStatsDto{" +
+                "id=" + id +
+                ", numQuizzes=" + numQuizzes +
+                ", uniqueQuizzesSolved=" + uniqueQuizzesSolved +
+                ", averageQuizzesSolved=" + averageQuizzesSolved +
+                ", academicTerm='" + academicTerm + '\'' +
                 '}'
     }
     
-    def compareQuestionStats(QuestionStatsDto studentStatsDto, QuestionStats studentStats) {
-        studentStatsDto.getId() == studentStats.getId()
-        studentStatsDto.getNumAvailable() == studentStats.getNumAvailable()
-        studentStatsDto.getAnsweredQuestionsUnique() == studentStats.getAnsweredQuestionsUnique()
-        studentStatsDto.getAverageQuestionsAnswered() == studentStats.getAverageQuestionsAnswered()
-        studentStatsDto.getAcademicTerm() == studentStats.getAcademicTerm()
-        studentStatsDto.toString() == "QuestionStatsDto{" +
-                "id=" + studentStats.getId() +
-                ", numAvailable=" + studentStats.getNumAvailable() +
-                ", answeredQuestionsUnique=" + studentStats.getAnsweredQuestionsUnique() +
-                ", averageQuestionsAnswered=" + studentStats.getAverageQuestionsAnswered() +
-                ", academicTerm='" + studentStats.getAcademicTerm() + '\'' +
+    def compareQuestionStats(QuestionStatsDto studentStatsDto, id, numAvailable, answeredQuestionsUnique, averageQuestionsAnswered, academicTerm) {
+        assert studentStatsDto.getId() == id
+        assert studentStatsDto.getNumAvailable() == numAvailable
+        assert studentStatsDto.getAnsweredQuestionsUnique() == answeredQuestionsUnique
+        assert studentStatsDto.getAverageQuestionsAnswered() == averageQuestionsAnswered
+        assert studentStatsDto.getAcademicTerm() == academicTerm
+        assert studentStatsDto.toString() == "QuestionStatsDto{" +
+                "id=" + id +
+                ", numAvailable=" + numAvailable +
+                ", answeredQuestionsUnique=" + answeredQuestionsUnique +
+                ", averageQuestionsAnswered=" + averageQuestionsAnswered +
+                ", academicTerm='" + academicTerm + '\'' +
                 '}'
     }
 }

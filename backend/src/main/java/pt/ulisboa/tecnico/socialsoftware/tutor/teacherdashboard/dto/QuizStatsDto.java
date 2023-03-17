@@ -60,7 +60,7 @@ public class QuizStatsDto {
             ", numQuizzes=" + numQuizzes +
             ", uniqueQuizzesSolved=" + uniqueQuizzesSolved +
             ", averageQuizzesSolved=" + averageQuizzesSolved +
-            ", academicTerm=" + academicTerm + '\'' +
+            ", academicTerm='" + academicTerm + '\'' +
             '}';
     }
 }
