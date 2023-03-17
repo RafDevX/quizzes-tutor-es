@@ -9,6 +9,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.repository.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuestionStatsRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuizStatsRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.StudentStatsRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services.TeacherDashboardService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
@@ -58,6 +61,12 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         dashboard13 != null
         dashboard22 != null
         dashboard23 != null
+
+        and: "stats are created"
+        def expected = 1 + 2 + 1 + 2
+        studentStatsRepository.count() == expected
+        quizStatsRepository.count() == expected
+        questionStatsRepository.count() == expected
     }
 
     @Unroll
@@ -70,13 +79,29 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         def mockTeacher3 = Mock(Teacher)
         mockTeacher3.getId() >> 3
 
+        and: "a mock course"
+        def mockCourse = Mock(Course)
+        mockCourse.getId() >> 1
+        mockCourse.getQuestions() >> []
+
         and: "two mock course executions"
         def mockCourseExecution1 = Mock(CourseExecution)
         mockCourseExecution1.getId() >> 1
         mockCourseExecution1.getTeachers() >> [mockTeacher1, mockTeacher3]
+        mockCourseExecution1.getCourse() >> mockCourse
+        mockCourseExecution1.getEndDate() >> LOCAL_DATE_YESTERDAY
+        mockCourseExecution1.getStudents() >> []
+        mockCourseExecution1.getQuizzes() >> []
         def mockCourseExecution2 = Mock(CourseExecution)
         mockCourseExecution2.getId() >> 2
         mockCourseExecution2.getTeachers() >> [mockTeacher2, mockTeacher3]
+        mockCourseExecution2.getCourse() >> mockCourse
+        mockCourseExecution2.getEndDate() >> LOCAL_DATE_TODAY
+        mockCourseExecution2.getStudents() >> []
+        mockCourseExecution2.getQuizzes() >> []
+
+        and: "mock course returns mock course executions"
+        mockCourse.getCourseExecutions() >> [mockCourseExecution1, mockCourseExecution2]
 
         and: "four mock teacher dashboards"
         def mockTeacherDashboard1 = Mock(TeacherDashboard)
@@ -111,9 +136,19 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
                 [dashboard1AlreadyExists, dashboard2AlreadyExists, dashboard3AlreadyExists, dashboard4AlreadyExists]
         )
 
+        and: "mock stats repositories"
+        def studentStatsRepository = Mock(StudentStatsRepository)
+        def quizStatsRepository = Mock(QuizStatsRepository)
+        def questionStatsRepository = Mock(QuestionStatsRepository)
+
         and: "a teacher dashboard service that uses the mock repositories"
-        def service = new TeacherDashboardService(courseExecutionRepository: courseExecutionRepository,
-                teacherDashboardRepository: teacherDashboardRepository)
+        def service = new TeacherDashboardService(
+                courseExecutionRepository: courseExecutionRepository,
+                teacherDashboardRepository: teacherDashboardRepository,
+                studentStatsRepository: studentStatsRepository,
+                quizStatsRepository: quizStatsRepository,
+                questionStatsRepository: questionStatsRepository
+        )
 
         when: "all teacher dashboards are updated"
         service.updateAllTeacherDashboards()
@@ -139,13 +174,18 @@ class UpdateAllTeacherDashboardsTest extends SpockTest {
         }) >> mockTeacherDashboard4
         0 * teacherDashboardRepository.save(*_) >> { throw new Exception("Unexpected call to save") }
 
+        and: "save method is called the correct number of times on stats repositories"
+        expectedStatsCalls * studentStatsRepository.save(_)
+        expectedStatsCalls * quizStatsRepository.save(_)
+        expectedStatsCalls * questionStatsRepository.save(_)
+
         where:
-        dashboard1AlreadyExists | dashboard2AlreadyExists | dashboard3AlreadyExists | dashboard4AlreadyExists
-        false                   | false                   | false                   | false
-        true                    | false                   | false                   | false
-        true                    | true                    | false                   | false
-        true                    | true                    | true                    | false
-        true                    | true                    | true                    | true
+        dashboard1AlreadyExists | dashboard2AlreadyExists | dashboard3AlreadyExists | dashboard4AlreadyExists || expectedStatsCalls
+        false                   | false                   | false                   | false                   || 1 + 2 + 1 + 2
+        true                    | false                   | false                   | false                   || 0 + 2 + 1 + 2
+        true                    | true                    | false                   | false                   || 0 + 0 + 1 + 2
+        true                    | true                    | true                    | false                   || 0 + 0 + 0 + 2
+        true                    | true                    | true                    | true                    || 0 + 0 + 0 + 0
     }
 
     def createCourseExecution(String acronym, String academicTerm, LocalDateTime endDate) {
