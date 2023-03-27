@@ -49,11 +49,6 @@ class RemoveTeacherDashboardTest extends SpockTest {
         def dashboard = createTeacherDashboard()
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
 
-        and: "the stats are removed"
-        studentStatsRepository.findAll().size() == 0        
-        quizStatsRepository.findAll().size() == 0
-        questionStatsRepository.findAll().size() == 0
-
         when: "the dashboard is removed for the second time"
         teacherDashboardService.removeTeacherDashboard(dashboard.getId())
 
@@ -67,11 +62,6 @@ class RemoveTeacherDashboardTest extends SpockTest {
         when: "an incorrect dashboard id is removed"
         teacherDashboardService.removeTeacherDashboard(dashboardId)
 
-        and: "the stats are removed"
-        studentStatsRepository.findAll().size() == 0
-        quizStatsRepository.findAll().size() == 0
-        questionStatsRepository.findAll().size() == 0
-
         then: "an exception is thrown"        
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.DASHBOARD_NOT_FOUND
@@ -83,3 +73,4 @@ class RemoveTeacherDashboardTest extends SpockTest {
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 }
+
