@@ -96,6 +96,7 @@ public class StudentStats implements DomainEntity {
         this.numMore75CorrectQuestions = (int) this.courseExecution.getQuizzes()
                 .stream()
                 .flatMap(quiz -> quiz.getQuizAnswers().stream())
+                .filter(QuizAnswer::isCompleted)
                 .collect(Collectors.groupingBy(
                         QuizAnswer::getStudent
                 ))
