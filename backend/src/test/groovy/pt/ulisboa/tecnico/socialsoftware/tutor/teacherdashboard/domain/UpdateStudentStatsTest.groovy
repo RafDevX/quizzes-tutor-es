@@ -78,6 +78,7 @@ class UpdateStudentStatsTest extends SpockTest {
 
         externalCourseExecution.addUser(student1)
         externalCourseExecution.addUser(student2)
+        externalCourseExecution.addUser(student3)
         externalCourseExecution2.addUser(student2)
         externalCourseExecution2.addUser(student3)
 
@@ -128,11 +129,16 @@ class UpdateStudentStatsTest extends SpockTest {
         createQuestionAnswer(quiz2AnswerStudent2, quiz1Question1, quiz1Question1OptionOK)
         createQuestionAnswer(quiz2AnswerStudent2, quiz2Question2, quiz2Question2OptionKO)
 
+        and: "student with >=75% correct answers but not completed"
+        def quiz1AnswerStudent3 = createQuizAnswer(quiz1, student3, false)
+        createQuestionAnswer(quiz1AnswerStudent3, quiz1Question1, quiz1Question1OptionOK)
+        createQuestionAnswer(quiz1AnswerStudent3, quiz1Question2, quiz1Question2OptionOK)
+
         when: "updating statistic"
         studentStats.update()
 
         then: "it has correct stats values"
-        studentStats.getNumStudents() == 2
+        studentStats.getNumStudents() == 3
         studentStats.getNumMore75CorrectQuestions() == 1
         studentStats.getNumAtLeast3Quizzes() == 1
 
@@ -142,7 +148,7 @@ class UpdateStudentStatsTest extends SpockTest {
                 studentStats.getId() +
                 ", courseExecution=" +
                 externalCourseExecution.toString() +
-                ", numStudents=2" +
+                ", numStudents=3" +
                 ", numMore75CorrectQuestions=1" +
                 ", numAtLeast3Quizzes=1}"
     }
@@ -200,9 +206,9 @@ class UpdateStudentStatsTest extends SpockTest {
         return option
     }
 
-    def createQuizAnswer(quiz, student) {
+    def createQuizAnswer(quiz, student, completed = true) {
         def quizAnswer = new QuizAnswer()
-        quizAnswer.setCompleted(true)
+        quizAnswer.setCompleted(completed)
         quizAnswer.setStudent(student)
         quizAnswer.setQuiz(quiz)
         quizAnswerRepository.save(quizAnswer)
