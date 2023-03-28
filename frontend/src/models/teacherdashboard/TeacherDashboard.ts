@@ -11,7 +11,7 @@ export default class TeacherDashboard {
       this.id = jsonObj.id;
       this.numberOfStudents = jsonObj.numberOfStudents;
       this.questionStats = jsonObj.questionStats.map(
-        (qs: QuestionStats) => new QuestionStats(qs)
+        (stats: QuestionStats) => new QuestionStats(stats)
       );
     }
   }
