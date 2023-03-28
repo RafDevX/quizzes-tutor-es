@@ -18,7 +18,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
-import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
+import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
 
 @Component({
   components: { AnimatedNumber },

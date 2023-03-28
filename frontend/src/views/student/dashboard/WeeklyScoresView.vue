@@ -25,7 +25,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import WeeklyScore from '@/models/dashboard/WeeklyScore';
+import WeeklyScore from '@/models/studentdashboard/WeeklyScore';
 
 @Component
 export default class WeeklyScoresView extends Vue {

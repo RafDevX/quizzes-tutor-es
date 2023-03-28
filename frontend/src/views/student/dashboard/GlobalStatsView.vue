@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import StudentStats from '@/models/dashboard/StudentStats';
+import StudentStats from '@/models/studentdashboard/StudentStats';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 
