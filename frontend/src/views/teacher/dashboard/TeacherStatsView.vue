@@ -3,11 +3,11 @@
     <h2>Statistics for this course execution</h2>
     <div v-if="teacherDashboard != null" class="stats-container">
       <div class="items">
-        <div ref="totalStudents" class="icon-wrapper">
+        <div ref="totalQuizzes" class="icon-wrapper">
           <animated-number :number="quizStats[0].numQuizzes" />
         </div>
         <div class="project-name">
-          <p>{{ QUIZ_STATS_ATTRIBUTES.NUM_QUIZZES }}</p>
+          <p>{{ attributes[0] }}</p>
         </div>
       </div>
       <div class="items">
@@ -15,15 +15,15 @@
           <animated-number :number="quizStats[0].uniqueQuizzesSolved" />
         </div>
         <div class="project-name">
-          <p>{{ QUIZ_STATS_ATTRIBUTES.UNIQUE_QUIZZES_SOLVED }}</p>
+          <p>{{ attributes[1] }}</p>
         </div>
       </div>
       <div class="items">
-        <div ref="quizzesSolved" class="icon-wrapper">
+        <div ref="averageSolved" class="icon-wrapper">
           <animated-number :number="quizStats[0].averageQuizzesSolved" />
         </div>
         <div class="project-name">
-          <p>{{ QUIZ_STATS_ATTRIBUTES.AVERAGE_QUIZZES_SOLVED }}</p>
+          <p>{{ attributes[2] }}</p>
         </div>
       </div>
     </div>
