@@ -1,40 +1,16 @@
 <template>
-  <Bar :chartOptions="chartOptions" :chartData="chartData" />
+  <Bar :chartData="chartData" :chartOptions="chartOptions" />
 </template>
 
 <script lang="ts">
+import 'chart.js/auto';
+import type { ChartData, ChartOptions } from 'chart.js';
 import { Bar } from 'vue-chartjs/legacy';
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from 'chart.js';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-);
-
-export default {
-  name: 'BarChart',
-  components: { Bar },
-  props: {
-    chartData: {
-      type: Object,
-      required: true,
-    },
-    chartOptions: {
-      type: Object,
-      required: true,
-    },
-  },
-};
+@Component({ components: { Bar } })
+export default class BarChart extends Vue {
+  @Prop({ required: true }) readonly chartData!: ChartData;
+  @Prop({ required: true }) readonly chartOptions!: ChartOptions;
+}
 </script>
