@@ -4,14 +4,30 @@
     <div v-if="teacherDashboard != null" class="stats-container">
       <div class="items">
         <div ref="totalStudents" class="icon-wrapper">
-          <animated-number :number="teacherDashboard.numberOfStudents" />
+          <animated-number :number="quizStats[0].numQuizzes" />
         </div>
         <div class="project-name">
-          <p>Number of Students</p>
+          <p>{{ QUIZ_STATS_ATTRIBUTES.NUM_QUIZZES }}</p>
+        </div>
+      </div>
+      <div class="items">
+        <div ref="quizzesSolved" class="icon-wrapper">
+          <animated-number :number="quizStats[0].uniqueQuizzesSolved" />
+        </div>
+        <div class="project-name">
+          <p>{{ QUIZ_STATS_ATTRIBUTES.UNIQUE_QUIZZES_SOLVED }}</p>
+        </div>
+      </div>
+      <div class="items">
+        <div ref="quizzesSolved" class="icon-wrapper">
+          <animated-number :number="quizStats[0].averageQuizzesSolved" />
+        </div>
+        <div class="project-name">
+          <p>{{ QUIZ_STATS_ATTRIBUTES.AVERAGE_QUIZZES_SOLVED }}</p>
         </div>
       </div>
     </div>
-</div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -19,6 +35,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
+import QuizStats from '@/models/teacherdashboard/QuizStats';
+
+enum QUIZ_STATS_ATTRIBUTES {
+  NUM_QUIZZES = 'Quizzes: Total Available',
+  UNIQUE_QUIZZES_SOLVED = 'Quizzes: Solved (Unique)',
+  AVERAGE_QUIZZES_SOLVED = 'Quizzes: Solved (Unique, Average Per Student)',
+}
 
 @Component({
   components: { AnimatedNumber },
@@ -27,11 +50,19 @@ import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
+  quizStats: QuizStats[] = [];
+
+  attributes: string[] = [
+    QUIZ_STATS_ATTRIBUTES.NUM_QUIZZES,
+    QUIZ_STATS_ATTRIBUTES.UNIQUE_QUIZZES_SOLVED,
+    QUIZ_STATS_ATTRIBUTES.AVERAGE_QUIZZES_SOLVED,
+  ];
 
   async created() {
     await this.$store.dispatch('loading');
     try {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
+      this.quizStats = this.teacherDashboard.quizStats;
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
