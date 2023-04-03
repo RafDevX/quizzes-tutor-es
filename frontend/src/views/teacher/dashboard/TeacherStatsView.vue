@@ -159,27 +159,27 @@ export default class TeacherStatsView extends Vue {
       return;
     }
 
-    this.charts = this.labels.map(({ collection, attributes }) => ({
-      collection,
-      labels: (
-        this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>
-      )
-        .map((stat) => stat.academicTerm)
-        .reverse(), // reverse to order from oldest to newest
-      datasets: attributes.map(({ attribute, label }, index) => ({
-        label,
-        data: (
-          this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>
-        )
-          .map((stat) => stat[attribute as keyof typeof stat] as number)
-          .reverse(), // reverse to order from oldest to newest
-        backgroundColor: Array(
-          (this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>)
-            .length
-        ).fill(['#C0392B', '#2980B9', '#1ABC9C'][index % 3]),
-        // bar colors in a repeating pattern of red, blue, green
-      })),
-    }));
+    this.charts = this.labels.map(({ collection, attributes }) => {
+      const collectionValues = this.teacherDashboard![
+        collection
+      ] as ArrayValues<TeacherDashboard>;
+
+      return {
+        collection,
+        labels: collectionValues.map((stat) => stat.academicTerm).reverse(),
+        // ^ reverse to order from oldest to newest
+        datasets: attributes.map(({ attribute, label }, index) => ({
+          label,
+          data: collectionValues
+            .map((stat) => stat[attribute as keyof typeof stat] as number)
+            .reverse(), // reverse to order from oldest to newest
+          backgroundColor: Array(collectionValues.length).fill(
+            ['#C0392B', '#2980B9', '#1ABC9C'][index % 3]
+          ),
+          // bar colors in a repeating pattern of red, blue, green
+        })),
+      };
+    });
   }
 
   async created() {
