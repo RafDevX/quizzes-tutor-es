@@ -34,7 +34,7 @@
     <template v-if="showComparisonCharts">
       <h2>Comparison with previous course executions</h2>
       <div class="stats-container">
-        <graph-bar
+        <bar-chart
           v-for="chart in charts"
           :key="chart.collection"
           :chartData="chart"
@@ -51,7 +51,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
-import GraphBar from '@/components/GraphBar.vue';
+import BarChart from '@/components/BarChart.vue';
 import { ChartData } from 'chart.js';
 
 // { a: number, b: string[] } => number | string[]
@@ -87,7 +87,7 @@ type DistributeCollectionLabel<U> = U extends keyof TeacherDashboard
   : never;
 
 @Component({
-  components: { AnimatedNumber, GraphBar },
+  components: { AnimatedNumber, BarChart },
 })
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
