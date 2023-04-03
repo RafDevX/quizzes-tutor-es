@@ -91,6 +91,23 @@ export default class TeacherStatsView extends Vue {
         },
       ],
     },
+    {
+      collection: 'questionStats',
+      attributes: [
+        {
+          attribute: 'numAvailable',
+          label: 'Questions: Total Available',
+        },
+        {
+          attribute: 'answeredQuestionsUnique',
+          label: 'Questions: Solved (Unique)',
+        },
+        {
+          attribute: 'averageQuestionsAnswered',
+          label: 'Questions: Solved (Unique, Average Per Student)',
+        },
+      ],
+    },
   ];
 
   async created() {
