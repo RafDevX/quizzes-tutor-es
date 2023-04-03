@@ -148,6 +148,13 @@ export default class TeacherStatsView extends Vue {
     },
   };
 
+  // colors to be used for bar chart's bars
+  barChartColors = [
+    '#C0392B', // red
+    '#2980B9', // blue
+    '#1ABC9C', // green
+  ];
+
   // array of charts to be displayed, with their respective data and
   // an additional property to identify the collection they refer to.
   // null if not yet populated
@@ -174,9 +181,9 @@ export default class TeacherStatsView extends Vue {
             .map((stat) => stat[attribute as keyof typeof stat] as number)
             .reverse(), // reverse to order from oldest to newest
           backgroundColor: Array(collectionValues.length).fill(
-            ['#C0392B', '#2980B9', '#1ABC9C'][index % 3]
+            this.barChartColors[index % this.barChartColors.length]
           ),
-          // bar colors in a repeating pattern of red, blue, green
+          // bar colors in a repeating pattern of the colors listed above
         })),
       };
     });
