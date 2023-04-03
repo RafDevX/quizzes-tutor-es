@@ -2,30 +2,34 @@
   <div class="container">
     <h2>Statistics for this course execution</h2>
     <div v-if="teacherDashboard != null" class="stats-container">
-      <div class="items">
-        <div ref="totalQuizzes" class="icon-wrapper">
-          <animated-number :number="quizStats[0].numQuizzes" />
+      <!--
+        use a template that does not translate to a real HTML element in
+        the final page structure, so that all items are treated equally in
+        the flexbox layout, which would not be the case with an additional
+        level of hierarchy -- helps if there isn't enough space to display
+        all of a collection's items in a single row
+      -->
+      <template v-for="{ collection, attributes } in labels">
+        <div
+          v-for="{ attribute, label } in attributes"
+          :key="attribute"
+          class="items"
+        >
+          <div class="icon-wrapper">
+            <animated-number
+              :number="
+                // @ts-ignore -- TS in Vue templates is not that good at inference;
+                // here, it doesn't know `attribute` refers to `collection` in particular,
+                // not to the union of all possible collections
+                teacherDashboard[collection][0][attribute]
+              "
+            />
+          </div>
+          <div class="project-name">
+            <p>{{ label }}</p>
+          </div>
         </div>
-        <div class="project-name">
-          <p>{{ attributes[0] }}</p>
-        </div>
-      </div>
-      <div class="items">
-        <div ref="quizzesSolved" class="icon-wrapper">
-          <animated-number :number="quizStats[0].uniqueQuizzesSolved" />
-        </div>
-        <div class="project-name">
-          <p>{{ attributes[1] }}</p>
-        </div>
-      </div>
-      <div class="items">
-        <div ref="averageSolved" class="icon-wrapper">
-          <animated-number :number="quizStats[0].averageQuizzesSolved" />
-        </div>
-        <div class="project-name">
-          <p>{{ attributes[2] }}</p>
-        </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -35,41 +39,70 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
-import QuizStats from '@/models/teacherdashboard/QuizStats';
 
-enum QUIZ_STATS_ATTRIBUTES {
-  NUM_QUIZZES = 'Quizzes: Total Available',
-  UNIQUE_QUIZZES_SOLVED = 'Quizzes: Solved (Unique)',
-  AVERAGE_QUIZZES_SOLVED = 'Quizzes: Solved (Unique, Average Per Student)',
-}
+// SomeType[] => SomeType
+type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
+
+// Utility type that allows restricting `attribute` to be a key
+// of (only) the collection `collection`
+type CollectionLabel<T extends keyof TeacherDashboard> = {
+  collection: T;
+  attributes: {
+    attribute: Exclude<
+      keyof ArrayElement<TeacherDashboard[T]>,
+      'id' | 'academicTerm'
+    >;
+    label: string;
+  }[];
+};
+
+// 'a' | 'b' | 'c' => CollectionLabel<'a'> | CollectionLabel<'b'> | CollectionLabel<'c'>
+// avoids CollectionLabel<'a' | 'b' | 'c'> which would happen if done manually,
+// and would lead to invalid typing
+type DistributeCollectionLabel<U> = U extends keyof TeacherDashboard
+  ? CollectionLabel<U>
+  : never;
 
 @Component({
   components: { AnimatedNumber },
 })
-
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
-  teacherDashboard: TeacherDashboard | null = null;
-  quizStats: QuizStats[] = [];
 
-  attributes: string[] = [
-    QUIZ_STATS_ATTRIBUTES.NUM_QUIZZES,
-    QUIZ_STATS_ATTRIBUTES.UNIQUE_QUIZZES_SOLVED,
-    QUIZ_STATS_ATTRIBUTES.AVERAGE_QUIZZES_SOLVED,
+  teacherDashboard: TeacherDashboard | null = null;
+
+  // ideally these'd be objects, e.g.
+  // { studentStats: { numStudents: 'Students: Total', ... }, ... }
+  // but that would not guarantee ordering, so we use 'uglier' arrays instead
+  labels: DistributeCollectionLabel<
+    Exclude<keyof TeacherDashboard, 'id' | 'numberOfStudents'>
+  >[] = [
+    {
+      collection: 'quizStats',
+      attributes: [
+        { attribute: 'numQuizzes', label: 'Quizzes: Total Available' },
+        {
+          attribute: 'uniqueQuizzesSolved',
+          label: 'Quizzes: Solved (Unique)',
+        },
+        {
+          attribute: 'averageQuizzesSolved',
+          label: 'Quizzes: Solved (Unique, Average Per Student)',
+        },
+      ],
+    },
   ];
 
   async created() {
     await this.$store.dispatch('loading');
     try {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
-      this.quizStats = this.teacherDashboard.quizStats;
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -93,7 +126,7 @@ export default class TeacherStatsView extends Vue {
   }
 
   .bar-chart {
-    background-color: rgba(255, 255, 255, 0.90);
+    background-color: rgba(255, 255, 255, 0.9);
     height: 400px;
   }
 }
