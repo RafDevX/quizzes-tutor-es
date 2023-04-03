@@ -63,7 +63,7 @@ type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
 // number | string[] | string | A[] => string[] | A[]
 type ArrayOnly<A> = A extends (infer _)[] ? A : never;
 
-// { a: number, b: string[] } => string[]
+// { a: number, b: string[], c: A[] } => string[] | A[]
 type ArrayValues<T> = ArrayOnly<ValueOf<T>>;
 
 // Utility type that allows restricting `attribute` to be a key
