@@ -31,6 +31,18 @@
         </div>
       </template>
     </div>
+    <template v-if="showComparisonCharts">
+      <h2>Comparison with previous course executions</h2>
+      <div class="stats-container">
+        <graph-bar
+          v-for="chart in charts"
+          :key="chart.collection"
+          :chartData="chart"
+          :chartOptions="chartOptions"
+          class="bar-chart"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -39,9 +51,20 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/teacherdashboard/TeacherDashboard';
+import GraphBar from '@/components/GraphBar.vue';
+import { ChartData } from 'chart.js';
+
+// { a: number, b: string[] } => number | string[]
+type ValueOf<T> = T[keyof T];
 
 // SomeType[] => SomeType
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
+
+// number | string[] | string | A[] => string[] | A[]
+type ArrayOnly<A> = A extends (infer _)[] ? A : never;
+
+// { a: number, b: string[] } => string[]
+type ArrayValues<T> = ArrayOnly<ValueOf<T>>;
 
 // Utility type that allows restricting `attribute` to be a key
 // of (only) the collection `collection`
@@ -64,7 +87,7 @@ type DistributeCollectionLabel<U> = U extends keyof TeacherDashboard
   : never;
 
 @Component({
-  components: { AnimatedNumber },
+  components: { AnimatedNumber, GraphBar },
 })
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
@@ -110,14 +133,78 @@ export default class TeacherStatsView extends Vue {
     },
   ];
 
+  // these options are used for all charts
+  chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    legend: {
+      display: true,
+      position: 'top',
+      labels: {
+        display: true,
+        fontColor: '#000',
+        fontSize: 14,
+      },
+    },
+  };
+
+  // array of charts to be displayed, with their respective data and
+  // an additional property to identify the collection they refer to.
+  // null if not yet populated
+  charts: (ChartData & { collection: string })[] | null = null;
+
+  populateChartData() {
+    if (!this.teacherDashboard) {
+      this.charts = null;
+      return;
+    }
+
+    this.charts = this.labels.map(({ collection, attributes }) => ({
+      collection,
+      labels: (
+        this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>
+      )
+        .map((stat) => stat.academicTerm)
+        .reverse(), // reverse to order from oldest to newest
+      datasets: attributes.map(({ attribute, label }, index) => ({
+        label,
+        data: (
+          this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>
+        )
+          .map((stat) => stat[attribute as keyof typeof stat] as number)
+          .reverse(), // reverse to order from oldest to newest
+        backgroundColor: Array(
+          (this.teacherDashboard![collection] as ArrayValues<TeacherDashboard>)
+            .length
+        ).fill(['#C0392B', '#2980B9', '#1ABC9C'][index % 3]),
+        // bar colors in a repeating pattern of red, blue, green
+      })),
+    }));
+  }
+
   async created() {
     await this.$store.dispatch('loading');
     try {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
+      this.populateChartData();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  // only show comparison charts if there are multiple course executions
+  // (more specifically, if at least one collection has multiple entries)
+  get showComparisonCharts() {
+    return (
+      this.teacherDashboard != null &&
+      this.charts != null &&
+      this.labels.some(
+        ({ collection }) =>
+          Array.isArray(this.teacherDashboard![collection]) &&
+          this.teacherDashboard![collection].length > 1
+      )
+    );
   }
 }
 </script>
@@ -145,6 +232,8 @@ export default class TeacherStatsView extends Vue {
   .bar-chart {
     background-color: rgba(255, 255, 255, 0.9);
     height: 400px;
+    width: 800px;
+    margin: 20px;
   }
 }
 
