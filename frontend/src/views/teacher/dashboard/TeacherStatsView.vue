@@ -101,18 +101,18 @@ export default class TeacherStatsView extends Vue {
     Exclude<keyof TeacherDashboard, 'id' | 'numberOfStudents'>
   >[] = [
     {
-        collection: 'studentStats',
-        attributes: [
-            { attribute: 'numStudents', label: 'Students: Total' },
-            {
-                attribute: 'numMore75CorrectQuestions',
-                label: 'Students: Solved >= 75% of Questions',
-            },
-            {
-                attribute: 'numAtLeast3Quizzes',
-                label: 'Students: Solved >= 3 Quizzes',
-            },
-        ],
+      collection: 'studentStats',
+      attributes: [
+        { attribute: 'numStudents', label: 'Students: Total' },
+        {
+          attribute: 'numMore75CorrectQuestions',
+          label: 'Students: Solved >= 75% of Questions',
+        },
+        {
+          attribute: 'numAtLeast3Quizzes',
+          label: 'Students: Solved >= 3 Quizzes',
+        },
+      ],
     },
     {
       collection: 'quizStats',
