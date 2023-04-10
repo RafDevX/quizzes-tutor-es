@@ -17,3 +17,7 @@
 import './login';
 import './commands';
 import './database';
+
+// Cypress plugin to compare screenshots
+import compareSnapshotCommand from 'cypress-image-diff-js/dist/command';
+compareSnapshotCommand();

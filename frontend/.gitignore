@@ -6,6 +6,9 @@ cypress/
 tests/e2e/videos/
 tests/e2e/screenshots/
 
+cypress-visual-screenshots/comparison/
+cypress-visual-screenshots/diff/
+
 # local env files
 .env
 *.env.json

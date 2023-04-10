@@ -1,5 +1,7 @@
 import { defineConfig } from 'cypress';
 
+import getCompareSnapshotsPlugin from 'cypress-image-diff-js/dist/plugin';
+
 const { Client } = require('pg');
 
 async function queryDB(query: string, credentials: string) {
@@ -26,6 +28,7 @@ export default defineConfig({
           return queryDB(query, credentials);
         },
       });
+      getCompareSnapshotsPlugin(on, config);
     },
     baseUrl: 'http://localhost:8081',
     specPattern: 'tests/e2e/specs/**/*.{js,jsx,ts,tsx}',
