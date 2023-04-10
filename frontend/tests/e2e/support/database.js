@@ -197,6 +197,135 @@ Cypress.Commands.add('deleteQuestionsAndAnswers', () => {
     `);
 });
 
+Cypress.Commands.add(
+  'createCourseExecutionOnDemoCourse',
+  (academicTerm, endDate) => {
+    dbCommand(`INSERT INTO course_executions (id, academic_term, acronym, end_date, status, type, course_id)
+            SELECT id+1, '${academicTerm}', acronym, '${endDate}', status, type, course_id FROM course_executions
+              WHERE acronym = 'DemoCourse'
+              AND id=(
+                SELECT max(id) FROM course_executions
+              )`);
+  }
+);
+
+Cypress.Commands.add('deleteCourseExecutionOnDemoCourse', (academicTerm) => {
+  dbCommand(`
+  DELETE FROM users_course_executions
+    WHERE course_executions_id IN (SELECT id FROM course_executions
+      WHERE acronym = 'DemoCourse' AND academic_term = '${academicTerm}');
+
+  DELETE FROM course_executions
+              WHERE acronym = 'DemoCourse'
+              AND academic_term = '${academicTerm}'`);
+});
+
+Cypress.Commands.add(
+  'changeDemoTeacherCourseExecutionMatchingAcademicTerm',
+  (academicTerm) => {
+    dbCommand(`UPDATE users_course_executions
+            SET course_executions_id=(SELECT id from course_executions WHERE academic_term = '${academicTerm}' LIMIT 1)
+            WHERE users_id=(SELECT id FROM users WHERE name='Demo Teacher')`);
+  }
+);
+
+Cypress.Commands.add('deleteTeacherDashboards', () => {
+  dbCommand(`DELETE FROM student_stats WHERE
+          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
+          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
+          DELETE FROM quiz_stats WHERE
+          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
+          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
+          DELETE FROM question_stats WHERE
+          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
+          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
+          DELETE FROM teacher_dashboard
+          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher');
+    `);
+});
+
+Cypress.Commands.add(
+  'createDemoTeacherDashboard',
+  (academicTerm, studentStats, quizStats, questionStats) => {
+    const courseExecutionQuery = (term) =>
+      `(SELECT id FROM course_executions WHERE acronym = 'DemoCourse' AND academic_term = '${term}')`;
+    const teacherQuery = `(SELECT id FROM users WHERE name = 'Demo Teacher')`;
+
+    dbCommand(`
+    WITH dashboard AS (
+      INSERT INTO teacher_dashboard (teacher_id, course_execution_id)
+        VALUES (
+          ${teacherQuery},
+          ${courseExecutionQuery(academicTerm)}
+        )
+        RETURNING ID
+      ),
+      student_stats_insert AS (
+        INSERT INTO student_stats (course_execution_id, teacher_dashboard_id, num_students, num_more_75_correct_questions, num_at_least_3_quizzes)
+        VALUES ${studentStats
+          .map(
+            ({
+              academicTerm: statsAcademicTerm,
+              numStudents,
+              numMore75CorrectQuestions,
+              numAtLeast3Quizzes,
+            }) => `
+            (
+              ${courseExecutionQuery(statsAcademicTerm)},
+              (SELECT id FROM dashboard),
+              ${numStudents},
+              ${numMore75CorrectQuestions},
+              ${numAtLeast3Quizzes}
+            )
+          `
+          )
+          .join(`, `)}
+      ),
+      quiz_stats_insert AS (
+        INSERT INTO quiz_stats (course_execution_id, teacher_dashboard_id, num_quizzes, unique_quizzes_solved, average_quizzes_solved)
+        VALUES ${quizStats
+          .map(
+            ({
+              academicTerm: statsAcademicTerm,
+              numQuizzes,
+              uniqueQuizzesSolved,
+              averageQuizzesSolved,
+            }) => `
+            (
+              ${courseExecutionQuery(statsAcademicTerm)},
+              (SELECT id FROM dashboard),
+              ${numQuizzes},
+              ${uniqueQuizzesSolved},
+              ${averageQuizzesSolved}
+            )
+          `
+          )
+          .join(`, `)}
+      )
+      INSERT INTO question_stats (course_execution_id, teacher_dashboard_id, num_available, answered_questions_unique, average_questions_answered)
+      VALUES ${questionStats
+        .map(
+          ({
+            academicTerm: statsAcademicTerm,
+            numAvailable,
+            answeredQuestionsUnique,
+            averageQuestionsAnswered,
+          }) => `
+          (
+            ${courseExecutionQuery(statsAcademicTerm)},
+            (SELECT id FROM dashboard),
+            ${numAvailable},
+            ${answeredQuestionsUnique},
+            ${averageQuestionsAnswered}
+          )
+        `
+        )
+        .join(`, `)}
+      ;
+  `);
+  }
+);
+
 const credentials = {
   user: Cypress.env('psql_db_username'),
   host: Cypress.env('psql_db_host'),
