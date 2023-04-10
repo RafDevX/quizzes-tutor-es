@@ -23,6 +23,7 @@
                 // not to the union of all possible collections
                 teacherDashboard[collection][0][attribute]
               "
+              :data-cy="`tile-${attribute}`"
             />
           </div>
           <div class="project-name">
@@ -37,6 +38,7 @@
         <bar-chart
           v-for="chart in charts"
           :key="chart.collection"
+          :data-cy="`chart-${chart.collection}`"
           :chartData="chart"
           :chartOptions="chartOptions"
           class="bar-chart"

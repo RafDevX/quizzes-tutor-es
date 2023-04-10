@@ -1,3 +1,9 @@
+const IMAGE_COMPARISON_RETRY_OPTIONS = {
+  limit: 3, // max number of retries
+  delay: 500, // delay before next comparison, ms
+};
+const IMAGE_COMPARISON_THRESHOLD = 0.01;
+
 describe('Teacher Dashboard', () => {
   // which course execution is initially associated with the demo teacher
   const INITIAL_ACADEMIC_TERM = '1st Semester';
@@ -109,5 +115,68 @@ describe('Teacher Dashboard', () => {
     for (const academicTerm of ACADEMIC_TERMS) {
       cy.deleteCourseExecutionOnDemoCourse(academicTerm.name);
     }
+  });
+
+  describe('Execution course with two past executions (2023)', () => {
+    beforeEach(() => {
+      // for simplification, have demo teacher only have one course execution
+      // at a time -- here, set it to 2023
+      cy.changeDemoTeacherCourseExecutionMatchingAcademicTerm(
+        ACADEMIC_TERMS[0].name
+      );
+
+      cy.demoTeacherLogin();
+    });
+
+    it('should display the correct statistics for the current year', () => {
+      cy.intercept('GET', '**/teachers/dashboards/executions/*').as(
+        'getDashboard'
+      );
+
+      // open the teacher dashboard
+      cy.get('[data-cy="dashboardMenuButton"]').click();
+      cy.wait('@getDashboard');
+
+      // check all tiles
+      for (const [attribute, expectedValue] of [
+        STUDENT_STATS,
+        QUIZ_STATS,
+        QUESTION_STATS,
+      ].flatMap((stats) => Object.entries(stats[0]))) {
+        cy.get(`[data-cy="tile-${attribute}"]`).should((tile) => {
+          // `should` currently does not natively support custom error
+          // messages, so we have to use `expect` instead;
+          // see https://github.com/cypress-io/cypress/issues/6474
+
+          expect(tile, `Tile ${attribute} has incorrect value`).to.have.text(
+            expectedValue.toString()
+          );
+        });
+      }
+    });
+
+    it('should display the correct charts', () => {
+      cy.intercept('GET', '**/teachers/dashboards/executions/*').as(
+        'getDashboard'
+      );
+
+      // open the teacher dashboard
+      cy.get('[data-cy="dashboardMenuButton"]').click();
+      cy.wait('@getDashboard');
+
+      // check all charts
+      for (const stat of ['studentStats', 'quizStats', 'questionStats']) {
+        cy.get(`[data-cy="chart-${stat}"]`).scrollIntoView({
+          offset: { top: -50 },
+        });
+        cy.get(`[data-cy="chart-${stat}"]`)
+          .should('be.visible')
+          .invoke('attr', 'style', 'background: white;')
+          .compareSnapshot(`${stat}2023`, IMAGE_COMPARISON_THRESHOLD, {
+            ...IMAGE_COMPARISON_RETRY_OPTIONS,
+            error: `Chart ${stat} does not sufficiently match the reference image`,
+          });
+      }
+    });
   });
 });
