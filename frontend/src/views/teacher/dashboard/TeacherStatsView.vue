@@ -147,18 +147,24 @@ export default class TeacherStatsView extends Vue {
     },
   ];
 
+  chartFont = {
+    size: 14,
+    family: '"Roboto", sans-serif',
+  };
+
   // these options are used for all charts
   chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    legend: {
-      display: true,
-      position: 'top',
-      labels: {
-        display: true,
-        fontColor: '#000',
-        fontSize: 14,
+    plugins: {
+      legend: {
+        labels: { font: this.chartFont },
+        title: { font: this.chartFont },
       },
+    },
+    scales: {
+      x: { ticks: { font: this.chartFont } },
+      y: { ticks: { font: this.chartFont } },
     },
   };
 
