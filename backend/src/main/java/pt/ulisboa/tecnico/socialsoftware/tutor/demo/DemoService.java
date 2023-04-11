@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswerItem;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerItemRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.domain.DifficultQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.repository.StudentDashboardRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.repository.DifficultQuestionRepository;
@@ -35,6 +36,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -229,6 +231,11 @@ public class DemoService {
     public void populateDemo() {
         Integer courseId = courseExecutionService.getDemoCourse().getCourseId();
         Integer courseExecutionId = courseExecutionService.getDemoCourse().getCourseExecutionId();
+
+        CourseExecution courseExecution = courseExecutionRepository.findById(courseExecutionId)
+            .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
+        courseExecution.setEndDate(LocalDateTime.now().plusDays(1));
+        courseExecutionRepository.save(courseExecution);
 
         Topic softwareArchitectureTopic = new Topic();
         softwareArchitectureTopic.setName("Software Architecture");
