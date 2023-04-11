@@ -179,4 +179,68 @@ describe('Teacher Dashboard', () => {
       }
     });
   });
+
+  describe('Execution course with one past execution (2022)', () => {
+    beforeEach(() => {
+      // for simplification, have demo teacher only have one course execution
+      // at a time -- here, set it to 2022
+      cy.changeDemoTeacherCourseExecutionMatchingAcademicTerm(
+        ACADEMIC_TERMS[1].name
+      );
+
+      cy.demoTeacherLogin();
+    });
+
+    it('should display the correct statistics for the current year', () => {
+      cy.intercept('GET', '**/teachers/dashboards/executions/*').as(
+        'getDashboard'
+      );
+
+      // open the teacher dashboard
+      cy.get('[data-cy="dashboardMenuButton"]').click();
+      cy.wait('@getDashboard');
+
+      // check all tiles
+      for (const [attribute, expectedValue] of [
+        STUDENT_STATS,
+        QUIZ_STATS,
+        QUESTION_STATS,
+      ].flatMap((stats) => Object.entries(stats[1]))) {
+        cy.get(`[data-cy="tile-${attribute}"]`).should((tile) => {
+          // `should` currently does not natively support custom error
+          // messages, so we have to use `expect` instead;
+          // see https://github.com/cypress-io/cypress/issues/6474
+
+          expect(tile, `Tile ${attribute} has incorrect value`).to.have.text(
+            expectedValue.toString()
+          );
+        });
+      }
+    });
+
+    it('should display the correct charts', () => {
+      cy.intercept('GET', '**/teachers/dashboards/executions/*').as(
+        'getDashboard'
+      );
+
+      // open the teacher dashboard
+      cy.get('[data-cy="dashboardMenuButton"]').click();
+      cy.wait('@getDashboard');
+
+      // check all charts
+      for (const stat of ['studentStats', 'quizStats', 'questionStats']) {
+        cy.get(`[data-cy="chart-${stat}"]`).scrollIntoView({
+          offset: { top: -50 },
+        });
+        cy.get(`[data-cy="chart-${stat}"]`)
+          .should('be.visible')
+          .invoke('attr', 'style', 'background: white;')
+          .compareSnapshot(`${stat}2022`, IMAGE_COMPARISON_THRESHOLD, {
+            ...IMAGE_COMPARISON_RETRY_OPTIONS,
+            error: `Chart ${stat} does not sufficiently match the reference image`,
+          });
+      }
+    });
+  });
+
 });
