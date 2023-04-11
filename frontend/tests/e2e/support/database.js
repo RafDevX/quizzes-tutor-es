@@ -230,17 +230,13 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('deleteTeacherDashboards', () => {
-  dbCommand(`DELETE FROM student_stats WHERE
-          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
-          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
-          DELETE FROM quiz_stats WHERE
-          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
-          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
-          DELETE FROM question_stats WHERE
-          teacher_dashboard_id IN (SELECT id FROM teacher_dashboard
-          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher'));
-          DELETE FROM teacher_dashboard
-          WHERE teacher_id IN (SELECT id FROM users WHERE name = 'Demo Teacher');
+  dbCommand(`
+          WITH teacher AS (SELECT id FROM users WHERE name = 'Demo Teacher'),
+            teacher_dashboards AS (SELECT id from teacher_dashboard WHERE teacher_id = (SELECT id FROM teacher)),
+            delete1 AS (DELETE FROM student_stats WHERE teacher_dashboard_id IN (SELECT id FROM teacher_dashboards)),
+            delete2 AS (DELETE FROM quiz_stats WHERE teacher_dashboard_id IN (SELECT id FROM teacher_dashboards)),
+            delete3 AS (DELETE FROM question_stats WHERE teacher_dashboard_id IN (SELECT id FROM teacher_dashboards))
+          DELETE FROM teacher_dashboard WHERE teacher_id = (SELECT id FROM teacher);
     `);
 });
 
