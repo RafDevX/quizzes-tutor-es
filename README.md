@@ -1,5 +1,21 @@
 <h1 align="center">Quizzes Tutor</h1>
 
+---------
+
+**⚠️⚠️⚠️ WARNING:** This is a snapshot of the real repository, which is private on GitLab.
+Screenshots of issues and merge requests are available in `ISSUES.md` and `MERGE_REQUESTS.png` respectively.
+
+This project was based off [Quizzes Tutor](https://github.com/socialsoftware/quizzes-tutor), with each sub-group
+having to implement specific features relating to Teacher Dashboard Statistics.
+
+Project sub-groups were:
+
+- ESA: Diogo Correia ([@diogotcorreia](https://github.com/diogotcorreia)) & Diogo Cardoso ([@D-Card](https://github.com/D-Card))
+- ESQ: Diogo Gaspar ([@randomicecube](https://github.com/randomicecube)) & Tomás Esteves ([@Pesteves2002](https://github.com/Pesteves2002))
+- ESP: Rafael Oliveira ([@RafDevX](https://github.com/RafDevX)) & Tiago Silva ([@trvds](https://github.com/trvds))
+
+---------
+
 <p align="center">
   <a href="https://github.com/socialsoftware/quizzes-tutor/actions">
     <img src="https://img.shields.io/github/workflow/status/socialsoftware/quizzes-tutor/build" alt="Build">
